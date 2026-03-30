@@ -1,0 +1,52 @@
+# DishCheck — Cursor Standing Instructions
+# Read before every prompt. These rules are non-negotiable.
+
+## What this project is
+DishCheck is a dish-level review web app. Users search for a specific dish
+at a specific restaurant and read or write reviews with photo + sub-ratings
+(taste, portion, value) + tags. Built with Next.js 14 App Router, Firebase,
+Tailwind CSS, Zustand, and TanStack Query. Deployed on Vercel.
+
+## Architecture rules
+- ALL Firebase SDK calls go through lib/firebase/ functions only.
+  Never import Firebase SDK directly inside components or pages.
+- ALL TypeScript types come from lib/types/index.ts.
+  Never define types inline. Never use `any`.
+- UI primitives live in components/ui/ only.
+  Feature components live in components/features/ only.
+  Never mix them.
+- Custom hooks live in lib/hooks/. Hooks call lib/firebase/ functions.
+  Hooks never call Firebase SDK directly.
+- Constants (tags, badges, levels) come from lib/constants/index.ts.
+  Never hardcode these values inline.
+
+## Code style
+- TypeScript strict mode. No `any`. No `ts-ignore`. No implicit returns.
+- Functional components only. No class components.
+- Named exports for components. Default exports for Next.js pages only.
+- Every async component must handle loading state and error state.
+- No inline styles. Tailwind classes only.
+- No CSS modules. No styled-components.
+- Prefer early returns over nested conditionals.
+
+## Firebase rules
+- Collection names: always import from lib/firebase/config.ts COLLECTIONS object.
+  Never hardcode collection name strings.
+- Always use Firestore Timestamp, never JS Date.
+- Always wrap Firebase calls in try/catch. Return null or [] on error.
+  Never let Firebase errors propagate silently.
+- Wishlist subcollection path: users/{userId}/wishlist/{dishId}.
+
+## Feature gates
+- Premium features (advanced filters, dish comparison):
+  Check user.isPremium === true before rendering. Show <UpgradePrompt /> if false.
+- Admin features: check user.isAdmin === true.
+  Redirect to "/" if false. Never render admin UI for non-admins.
+
+## What NOT to do
+- Do not add features not in the sprint scope.
+- Do not change the data model without explicit instruction.
+- Do not write Firestore security rules (human writes these).
+- Do not use localStorage for anything auth-related.
+- Do not install new packages without asking first.
+- Do not refactor and add features in the same response.
