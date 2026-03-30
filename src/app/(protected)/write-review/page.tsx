@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/lib/hooks/useAuth'
@@ -16,7 +16,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { TAG_LIST } from '@/lib/constants'
 import type { Dish } from '@/lib/types'
 
-export default function WriteReviewPage() {
+function WriteReviewContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const dishId = searchParams.get('dishId') ?? ''
@@ -238,5 +238,13 @@ export default function WriteReviewPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function WriteReviewPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-20"><LoadingSpinner /></div>}>
+      <WriteReviewContent />
+    </Suspense>
   )
 }

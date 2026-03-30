@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AuthShell } from '@/components/layouts/AuthShell'
 import { signInWithEmail, signInWithGoogle } from '@/lib/hooks/useAuth'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/home'
@@ -37,7 +37,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthShell title="Welcome back" subtitle="Sign in to your account">
+    <>
       <button
         onClick={handleGoogle}
         className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -89,6 +89,16 @@ export default function LoginPage() {
         Don&apos;t have an account?{' '}
         <Link href="/signup" className="text-brand hover:underline">Sign up</Link>
       </p>
+    </>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <AuthShell title="Welcome back" subtitle="Sign in to your account">
+      <Suspense fallback={<div className="flex justify-center py-4"><LoadingSpinner /></div>}>
+        <LoginForm />
+      </Suspense>
     </AuthShell>
   )
 }

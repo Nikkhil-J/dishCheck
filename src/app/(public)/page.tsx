@@ -3,8 +3,6 @@ import { getTopDishes } from '@/lib/firebase/dishes'
 import { getAllRestaurants } from '@/lib/firebase/restaurants'
 import { DishCard } from '@/components/features/DishCard'
 import { RestaurantCard } from '@/components/features/RestaurantCard'
-import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
 import { CUISINE_TYPES } from '@/lib/constants'
 
 export const revalidate = 3600
@@ -29,10 +27,10 @@ export default async function LandingPage() {
           Honest reviews from real food lovers. Find your next favourite dish — not just the restaurant.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/browse" className={cn(buttonVariants({ size: 'lg' }), 'bg-brand hover:bg-brand-dark')}>
+          <Link href="/browse" className="inline-flex items-center justify-center rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark">
             Browse Dishes
           </Link>
-          <Link href="/search" className={cn(buttonVariants({ variant: 'outline', size: 'lg' }))}>
+          <Link href="/search" className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Search
           </Link>
         </div>
@@ -107,7 +105,7 @@ export default async function LandingPage() {
         <p className="mt-2 text-brand-light">Join the community and share your honest reviews.</p>
         <Link
           href="/signup"
-          className={cn(buttonVariants({ variant: 'secondary', size: 'lg' }), 'mt-6')}
+          className="mt-6 inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-medium text-brand hover:bg-brand-light"
         >
           Create free account
         </Link>

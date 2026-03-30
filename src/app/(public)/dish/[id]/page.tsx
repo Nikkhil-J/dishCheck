@@ -9,8 +9,6 @@ import { SubRatingBar } from '@/components/ui/SubRatingBar'
 import { TagCloud } from '@/components/ui/TagCloud'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { formatRating } from '@/lib/utils/index'
-import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -92,7 +90,7 @@ export default async function DishPage({ params }: PageProps) {
           <div className="mt-6">
             <Link
               href={`/write-review?dishId=${dish.id}&restaurantId=${dish.restaurantId}`}
-              className={cn(buttonVariants({ size: 'lg' }), 'bg-brand hover:bg-brand-dark')}
+              className="inline-flex items-center justify-center rounded-lg bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark"
             >
               Write a Review
             </Link>
