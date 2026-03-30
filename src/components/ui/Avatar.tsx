@@ -99,6 +99,33 @@ function AvatarGroupCount({
   )
 }
 
+/** Convenience component — renders Avatar + AvatarImage + AvatarFallback with initials. */
+function UserAvatar({
+  src,
+  name,
+  size = "default",
+  className,
+}: {
+  src?: string | null
+  name: string
+  size?: "default" | "sm" | "lg"
+  className?: string
+}) {
+  const initials = name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
+  return (
+    <Avatar size={size} className={className}>
+      {src && <AvatarImage src={src} alt={name} />}
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
+  )
+}
+
 export {
   Avatar,
   AvatarImage,
@@ -106,4 +133,5 @@ export {
   AvatarGroup,
   AvatarGroupCount,
   AvatarBadge,
+  UserAvatar,
 }
