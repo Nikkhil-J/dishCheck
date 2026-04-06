@@ -4,14 +4,16 @@ interface SkeletonCardProps {
   className?: string
 }
 
+const shimmerBg = 'bg-[length:400%_100%] bg-[linear-gradient(90deg,var(--shimmer-from)_25%,var(--shimmer-via)_50%,var(--shimmer-to)_75%)] animate-shimmer'
+
 export function SkeletonCard({ className }: SkeletonCardProps) {
   return (
-    <div className={cn('animate-pulse rounded-2xl bg-white p-4 shadow-sm', className)}>
-      <div className="aspect-video w-full rounded-xl bg-gray-200" />
-      <div className="mt-3 space-y-2">
-        <div className="h-4 w-3/4 rounded bg-gray-200" />
-        <div className="h-3 w-1/2 rounded bg-gray-200" />
-        <div className="h-3 w-full rounded bg-gray-200" />
+    <div className={cn('overflow-hidden rounded-lg border border-border bg-card', className)}>
+      <div className={cn('h-36 w-full', shimmerBg)} />
+      <div className="p-3.5 space-y-2.5">
+        <div className={cn('h-4 w-3/4 rounded-md', shimmerBg)} />
+        <div className={cn('h-3 w-1/2 rounded-md', shimmerBg)} />
+        <div className={cn('h-3 w-1/3 rounded-md', shimmerBg)} />
       </div>
     </div>
   )

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(mkdir -p app/\\\\\\(public\\\\\\)/search app/\\\\\\(public\\\\\\)/browse \"app/\\(public\\)/dish/[id]\" \"app/\\(public\\)/restaurant/[id]\" \"app/\\(public\\)/review/[id]\" app/\\\\\\(auth\\\\\\)/login app/\\\\\\(auth\\\\\\)/signup app/\\\\\\(auth\\\\\\)/forgot-password app/\\\\\\(protected\\\\\\)/home \"app/\\(protected\\)/profile/[userId]\" app/\\\\\\(protected\\\\\\)/my-profile app/\\\\\\(protected\\\\\\)/wishlist app/\\\\\\(protected\\\\\\)/settings app/\\\\\\(protected\\\\\\)/write-review app/\\\\\\(protected\\\\\\)/notifications app/\\\\\\(admin\\\\\\)/dashboard app/\\\\\\(admin\\\\\\)/restaurants app/\\\\\\(admin\\\\\\)/dishes app/\\\\\\(admin\\\\\\)/requests app/\\\\\\(admin\\\\\\)/moderation app/\\\\\\(admin\\\\\\)/users components/ui components/features components/layouts lib/firebase lib/hooks lib/utils lib/types lib/constants)",
+      "Bash(mkdir -p ../public/badges ../public/images)",
+      "Bash(npx tsc:*)",
+      "Bash(npx shadcn@latest init --help)",
+      "Bash(npx shadcn@latest init -y --template next)",
+      "Bash(printf '\\\\n\\\\n')",
+      "Bash(npx shadcn@latest init -y --template next --defaults)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

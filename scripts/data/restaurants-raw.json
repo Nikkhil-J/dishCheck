@@ -1,0 +1,1003 @@
+{
+  "_instructions": [
+    "Real restaurant data for DishCheck — Bengaluru and Gurugram.",
+    "Run: npx tsx scripts/seed-from-json.ts --dry-run (verify first)",
+    "Then run: npx tsx scripts/seed-from-json.ts"
+  ],
+  "_stats": {
+    "totalRestaurants": 4,
+    "bengaluru": 2,
+    "gurugram": 2,
+    "fetchedAt": "2026-04-05T00:00:00.000Z"
+  },
+  "restaurants": [
+    {
+      "googlePlaceId": "blr-planb-indiranagar",
+      "name": "Plan B - House of Wings",
+      "city": "Bengaluru",
+      "area": "Indiranagar",
+      "address": "1134, 100 Feet Rd, Hal 2nd Stage, Indiranagar, Bengaluru",
+      "coordinates": { "lat": 12.9784, "lng": 77.6408 },
+      "googleRating": 4.1,
+      "googleMapsUrl": null,
+      "website": null,
+      "phoneNumber": null,
+      "cuisines": ["American", "Continental"],
+      "priceLevel": "800-1700",
+      "types": ["restaurant"],
+      "dishes": [
+        {
+          "name": "Grilled Corn on the Cob",
+          "description": "American sweet corn grilled, choice of peri peri, barbeque or creamy buffalo dip.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "170-170"
+        },
+        {
+          "name": "Jalapeno Poppers",
+          "description": "Served with cocktail dip.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Broccoli and Cheese Croquettes",
+          "description": "Served with marinara sauce.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Stuffed Mushrooms",
+          "description": "Panko crusted mushroom stuffed with spicy filling, deep fried.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Corn and Cheese Bon Bons",
+          "description": "Served with spicy marinara.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Crispy Paneer",
+          "description": "Choice of sauce — smoked sweet chili, fire cracker or barbeque.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "French Fries",
+          "description": "Plain, peri peri, sour cream or onion seasoning.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "245-245"
+        },
+        {
+          "name": "Loaded French Fries",
+          "description": "Fries topped with spicy beans, cheese sauce, pico de galo and sour cream. Available veg or chicken.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "305-350"
+        },
+        {
+          "name": "Mexican Nachos",
+          "description": "Corn chips, nacho beans, queso sauce, pico de galo, salsa, scallions and sour cream. Available veg or chicken.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "290-345"
+        },
+        {
+          "name": "Crispy Fried Chicken Strips",
+          "description": "Batter fried chicken, tossed in peri peri seasoning.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "345-345"
+        },
+        {
+          "name": "Chicken Popcorn",
+          "description": "Chicken morsel batter fried tossed in your choice of seasoning — peri peri, sour cream onion or smoked sweet chili.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "345-345"
+        },
+        {
+          "name": "Chilli Chicken",
+          "description": "Chicken morsels marinated in asian spices and soy batter fried tossed with green peppercorn.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "345-345"
+        },
+        {
+          "name": "Fiery Chicken",
+          "description": "Grilled chicken thigh julienne, tossed in house special seasoning.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "345-345"
+        },
+        {
+          "name": "Crispy Bacon",
+          "description": "Crispy batter fried bacon, served with spicy BBQ sauce.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "430-430"
+        },
+        {
+          "name": "Fish Fingers",
+          "description": "Golden-brown crispy fish fingers made from fish fillets, perfectly seasoned and coated in panko, served with tartare sauce.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "405-405"
+        },
+        {
+          "name": "House of Wings - Half Dozen",
+          "description": "6 wings in your choice of sauce: ABS, Fire Cracker, Flamin Jalapeno, Korean Gochujang, Spicy Garlic, Honey Chilli, Chipotle BBQ, Cocktail, Garlic Parmesan, Creamy Buffalo, Naked Peri Peri, Citrus Peri Peri, Smoked Sweet Chili, Lemon and Herb, Sour Cream and Onion.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "490-490"
+        },
+        {
+          "name": "House of Wings - One Dozen",
+          "description": "12 wings in your choice of sauce from the full wings menu.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "690-690"
+        },
+        {
+          "name": "House of Wings - One Bucket",
+          "description": "Full bucket of wings in your choice of sauce from the full wings menu.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "1075-1075"
+        },
+        {
+          "name": "Veggie Wingers",
+          "description": "Plant-based wingers in your choice of sauce.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "360-360"
+        },
+        {
+          "name": "Mushroom Wingers",
+          "description": "Mushroom wingers in your choice of sauce.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "360-360"
+        },
+        {
+          "name": "Crispy Fried Paneer Burger",
+          "description": "American corn and potato patty, deep fried topped with cheese and salsa.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "435-435"
+        },
+        {
+          "name": "Motherclucker Burger",
+          "description": "Spicy batter fried chicken, dusted with peri peri, topped with our famous creamy buffalo sauce.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "510-510"
+        },
+        {
+          "name": "Classic Bacon Cheese Tenderloin Smashed Burger",
+          "description": "All American grilled tenderloin pattie, topped with bacon, cheese and pickles.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "540-540"
+        },
+        {
+          "name": "Korean Fried Chicken Burger",
+          "description": "Fried chicken thigh dipped in honey gochujang sauce, creamy slaw and pickled cucumber.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "510-510"
+        },
+        {
+          "name": "Grilled Tenderloin Medallions",
+          "description": "Marinated tenderloin fillet grilled and served with mashed potato, buttered veggies, choice of mushroom or pepper sauce.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "595-595"
+        },
+        {
+          "name": "Mac N Cheese",
+          "description": "Our version of the timeless American classic. Available veg, chicken or bacon.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "410-455"
+        },
+        {
+          "name": "Stuffed Corn Tacos",
+          "description": "Taco seasoning, chipotle chili, greens, grilled meat or veggies mix, sour cream, salsa on side. Available paneer, chicken or beef.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "400-430"
+        },
+        {
+          "name": "Crispy Fried Prawns",
+          "description": "Crispy fried prawns tossed in cajun or peri peri seasoning.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "545-545"
+        },
+        {
+          "name": "Margherita Pizza",
+          "description": "The classic San Marzano tomato sauce with fior di latte, fresh basil and parmesan, drizzled with olive oil.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "435-435"
+        },
+        {
+          "name": "Chipotle Chicken Pizza",
+          "description": "Smoky chipotle chicken, creamy sour cream and gooey cheese on a hand rolled base.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "545-545"
+        },
+        {
+          "name": "Pepperoni Pizza",
+          "description": "Classic cheesy pepperoni with fior di latte and San Marzano tomato sauce baked over sourdough base.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "590-590"
+        },
+        {
+          "name": "Chocolate Lava Cake",
+          "description": "Cake stuffed with chocolate served hot with a dollop of ice cream on the side.",
+          "category": "Dessert",
+          "dietary": "veg",
+          "priceRange": "270-270"
+        },
+        {
+          "name": "Brownie",
+          "description": "Delicately baked brownie with toasted nuts.",
+          "category": "Dessert",
+          "dietary": "veg",
+          "priceRange": "270-270"
+        },
+        {
+          "name": "Red Velvet Cake",
+          "description": "Moist layers of red velvet filled and topped with silky cream cheese frosting.",
+          "category": "Dessert",
+          "dietary": "veg",
+          "priceRange": "270-270"
+        }
+      ]
+    },
+
+    {
+      "googlePlaceId": "blr-shokudo-aurobindomarg",
+      "name": "Shokudo - Japanese and Pan Asian Restaurant",
+      "city": "Bengaluru",
+      "area": "Indiranagar",
+      "address": "No 670, 1st Floor, 11th Main Road, Aurobindo Marg, Bengaluru",
+      "coordinates": { "lat": 12.9716, "lng": 77.6412 },
+      "googleRating": 4.6,
+      "googleMapsUrl": null,
+      "website": null,
+      "phoneNumber": null,
+      "cuisines": ["Japanese", "Asian", "Korean"],
+      "priceLevel": "700-1500",
+      "types": ["restaurant"],
+      "dishes": [
+        {
+          "name": "Miso Supu",
+          "description": "Traditional Japanese miso soup.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "295-325"
+        },
+        {
+          "name": "Tom Kha Sup",
+          "description": "Creamy and aromatic Thai soup.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "295-295"
+        },
+        {
+          "name": "Tom Yum Sup",
+          "description": "Spicy and sour Thai soup.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "295-345"
+        },
+        {
+          "name": "Kimchi Guk",
+          "description": "Spicy and soul-warming kimchi soup.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Manchow Tang",
+          "description": "A fiery fusion of flavors, a hot and spicy soup served with crispy noodles.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "245-275"
+        },
+        {
+          "name": "Japanese Sweet Miso Salad",
+          "description": "A creamy and sweet salad with a hint of miso, perfect for a light and flavorful appetizer.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Som Tam",
+          "description": "Spicy Thai salad made with shredded green papaya, carrots, tomatoes, and a tangy dressing of lime juice and chili peppers.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "345-345"
+        },
+        {
+          "name": "Kappa Maki",
+          "description": "Classic veg sushi roll with cucumber and spicy mayo. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "220-385"
+        },
+        {
+          "name": "California Roll",
+          "description": "Fried tofu, cucumber, avocado, topped with sesame seeds and a sprinkle of paprika and sriracha. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "320-560"
+        },
+        {
+          "name": "Philadelphia Roll",
+          "description": "Cream cheese, avocado, cucumber, bell peppers topped with avocado slices, wasabi and spicy mayo. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "320-560"
+        },
+        {
+          "name": "Veg Shokudo Special Sushi",
+          "description": "Chef's special dynamite roll — deep fried maki. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "340-595"
+        },
+        {
+          "name": "Teriyaki Chicken Sushi",
+          "description": "Grilled chicken and avocado with teriyaki sauce. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "320-560"
+        },
+        {
+          "name": "Spicy Salmon Sushi",
+          "description": "Cucumber topped with sliced salmon, spicy mayo, sriracha sauce and togarashi. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "380-665"
+        },
+        {
+          "name": "Philadelphia Roll Non Veg",
+          "description": "Cream cheese, smoked salmon, cucumber, topped with smoked salmon and spicy mayo. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "400-700"
+        },
+        {
+          "name": "Flamed Salmon Roll",
+          "description": "Torched salmon sushi for a smoky flavor. 4 or 8 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "420-735"
+        },
+        {
+          "name": "Sashimi",
+          "description": "Thinly sliced raw fish, served with soy sauce, wasabi, and pickled ginger. 6 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "725-725"
+        },
+        {
+          "name": "Mushroom Marvel Bao",
+          "description": "Mushroom shaped bao filled with a delightful mushroom mix. 2 pieces.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Veg Gyoza",
+          "description": "Japanese dumplings, steamed then pan-fried, with a savory filling of miso flavored veggies. 5 pieces.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "345-345"
+        },
+        {
+          "name": "Edamame Truffle Dimsum",
+          "description": "Dimsum filled with truffle-infused edamame. 4 pieces.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "395-395"
+        },
+        {
+          "name": "Chilly Garlic Edamame",
+          "description": "Edamame beans tossed in a fiery chili-garlic sauce.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "395-395"
+        },
+        {
+          "name": "Chicken Gyoza",
+          "description": "Japanese dumplings, steamed then pan-fried, with a miso minced chicken filling. 5 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "395-395"
+        },
+        {
+          "name": "Shokudo Special Dimsum",
+          "description": "Chef's special dumplings featuring a savory filling of minced chicken and aromatic spices. 4 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "425-425"
+        },
+        {
+          "name": "Prawn Hargao",
+          "description": "A classic asian dumpling with a translucent skin, filled with a mixture of shrimp and vegetables. 4 pieces.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "425-425"
+        },
+        {
+          "name": "Takoyaki",
+          "description": "Japanese street food consisting of bite-sized balls of batter filled with diced octopus.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "445-445"
+        },
+        {
+          "name": "Ebi Fry",
+          "description": "Deep-fried shrimp breaded in panko, golden brown and crispy.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "495-495"
+        },
+        {
+          "name": "Tori Karaage",
+          "description": "Japanese fried chicken, marinated in a blend of soy sauce, ginger, and garlic.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "395-395"
+        },
+        {
+          "name": "Yangnyeom Chicken",
+          "description": "Korean fried chicken with a sweet and spicy sauce.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "445-445"
+        },
+        {
+          "name": "Calamari Salt and Pepper",
+          "description": "Crispy golden-brown calamari rings, seasoned with a classic salt and pepper blend.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "495-495"
+        },
+        {
+          "name": "Coconut Shrimp",
+          "description": "Crispy coconut-crusted shrimp, a tropical delight.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "525-525"
+        },
+        {
+          "name": "Ebi Mayo",
+          "description": "Crispy deep-fried shrimp, topped with a creamy mayonnaise sauce.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "545-545"
+        },
+        {
+          "name": "Miso Ramen",
+          "description": "A rich and flavorful ramen with a miso-based broth. Comes with unlimited broth.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "425-475"
+        },
+        {
+          "name": "Tonkatsu Ramen",
+          "description": "A hearty and creamy ramen made with inhouse broth, topped with pakchoy and beni shoga. Available veg, chicken or pork.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "475-575"
+        },
+        {
+          "name": "Naruto Ramen",
+          "description": "Ichiraku's ramen from popular anime series Naruto, made with hearty inhouse secret broth.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "495-595"
+        },
+        {
+          "name": "Tantanmen Ramen",
+          "description": "A spicy noodle soup featuring a rich, creamy broth flavored with sesame paste and chili oil.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "475-525"
+        },
+        {
+          "name": "Buldak Ramyeon",
+          "description": "A popular fiery ramen topped with jammy eggs, chicken sausage, spring onions, broccoli and tteok.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "545-545"
+        },
+        {
+          "name": "One Piece Ramen",
+          "description": "A unique flavorful ramen from popular anime and manga series One Piece.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "475-475"
+        },
+        {
+          "name": "Omu Rice",
+          "description": "Japanese dish consisting of fried rice wrapped in a thin omelette.",
+          "category": "Main Course",
+          "dietary": "egg",
+          "priceRange": "395-395"
+        },
+        {
+          "name": "Katsudon",
+          "description": "Japanese dish featuring a crispy breaded katsu served over a bowl of rice topped with a savory egg mixture.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "545-595"
+        },
+        {
+          "name": "Dorayaki",
+          "description": "Small pancake-like patties made from castella, wrapped around a sweet filling. As seen in Doraemon.",
+          "category": "Dessert",
+          "dietary": "veg",
+          "priceRange": "295-295"
+        },
+        {
+          "name": "Taiyaki",
+          "description": "Japanese fish-shaped cake filled with red bean paste.",
+          "category": "Dessert",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Mitrashi Dango",
+          "description": "Japanese rice dumplings served on a skewer and dipped in a sweet soy sauce.",
+          "category": "Dessert",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        }
+      ]
+    },
+
+    {
+      "googlePlaceId": "grg-kogai-golfcourseroad",
+      "name": "Kogai - Fine Japanese Dining",
+      "city": "Gurugram",
+      "area": "Golf Course Road",
+      "address": "Ground Floor, Global Foyer Mall, Golf Course Road, Gurugram",
+      "coordinates": { "lat": 28.4595, "lng": 77.1026 },
+      "googleRating": 4.8,
+      "googleMapsUrl": null,
+      "website": null,
+      "phoneNumber": null,
+      "cuisines": ["Japanese", "Asian"],
+      "priceLevel": "1000-2000",
+      "types": ["restaurant"],
+      "dishes": [
+        {
+          "name": "Classic Japanese Miso Soup",
+          "description": "Umami-rich miso broth with tofu and seaweed.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "260-260"
+        },
+        {
+          "name": "Prawn Miso Soup",
+          "description": "Umami-rich miso broth with prawns and seaweed.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "360-360"
+        },
+        {
+          "name": "Hijiki Miso Soup",
+          "description": "Traditional miso broth with hijiki seaweed and tofu.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "290-290"
+        },
+        {
+          "name": "Chicken Miso Soup",
+          "description": "Comforting miso soup with tender chicken.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "310-310"
+        },
+        {
+          "name": "Potato Salad",
+          "description": "Mashed potato and vegetables with Japanese mayo.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "390-390"
+        },
+        {
+          "name": "Tuna Avocado Salad",
+          "description": "Diced tuna and avocado salad.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "720-720"
+        },
+        {
+          "name": "Yasai Salad",
+          "description": "Seasonal vegetable salad with tofu.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "490-490"
+        },
+        {
+          "name": "Kaisen Salad",
+          "description": "Seafood salad with peanut dressing.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "720-720"
+        },
+        {
+          "name": "Tofu Teriyaki Set",
+          "description": "Japanese lunch set with tofu teriyaki, rice, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "720-720"
+        },
+        {
+          "name": "Yasai No Tempura Set",
+          "description": "Japanese lunch set with vegetable tempura, rice, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "720-720"
+        },
+        {
+          "name": "Tori No Karaage Set",
+          "description": "Japanese lunch set with crispy fried chicken, rice, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "750-750"
+        },
+        {
+          "name": "Tori No Teriyaki Set",
+          "description": "Japanese lunch set with chicken teriyaki, rice, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "750-750"
+        },
+        {
+          "name": "Tonkatsu Set",
+          "description": "Japanese lunch set with breaded pork cutlet, rice, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "790-790"
+        },
+        {
+          "name": "Katsu Don Set",
+          "description": "Japanese rice bowl with breaded pork cutlet and egg, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "790-790"
+        },
+        {
+          "name": "Salmon Don Set",
+          "description": "Japanese rice bowl with fresh salmon, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "1050-1050"
+        },
+        {
+          "name": "Kaisen Don Set",
+          "description": "Japanese rice bowl with assorted seafood, miso soup and sides.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "1050-1050"
+        },
+        {
+          "name": "Chicken Garlic Butter Set",
+          "description": "Japanese lunch set with chicken in garlic butter sauce, rice and miso soup.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "790-790"
+        },
+        {
+          "name": "Ebi Tempura and Sashimi Bento",
+          "description": "Shokado bento box with prawn tempura and assorted sashimi.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "1150-1150"
+        },
+        {
+          "name": "Tori Umani and Karaage Bento",
+          "description": "Shokado bento box with simmered chicken and fried chicken karaage.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "1050-1050"
+        },
+        {
+          "name": "Chicken Omurice",
+          "description": "Omelette stuffed with chicken fried rice.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "620-620"
+        },
+        {
+          "name": "Yakimeshi",
+          "description": "Japanese style fried rice, available in veg, chicken, pork, prawns or seafood.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "580-720"
+        },
+        {
+          "name": "Chicken Katsu Curry Rice",
+          "description": "Crispy breaded chicken over Japanese curry rice.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "740-740"
+        },
+        {
+          "name": "Onigiri",
+          "description": "2 piece Japanese rice balls, available in ume or salmon.",
+          "category": "Snack",
+          "dietary": "non-veg",
+          "priceRange": "420-490"
+        },
+        {
+          "name": "Gohan",
+          "description": "Plain Japanese steamed rice.",
+          "category": "Side Dish",
+          "dietary": "veg",
+          "priceRange": "260-260"
+        }
+      ]
+    },
+
+    {
+      "googlePlaceId": "grg-thebeercafe-ambiencemall",
+      "name": "The Beer Cafe",
+      "city": "Gurugram",
+      "area": "Ambience Mall",
+      "address": "Level 4, Platinum Towers, Ambience Mall, Gurugram",
+      "coordinates": { "lat": 28.5025, "lng": 77.0901 },
+      "googleRating": 4.4,
+      "googleMapsUrl": null,
+      "website": null,
+      "phoneNumber": null,
+      "cuisines": ["Continental", "North Indian", "American"],
+      "priceLevel": "800-1600",
+      "types": ["restaurant"],
+      "dishes": [
+        {
+          "name": "Papad Bucket",
+          "description": "Crispy roasted papad rolls served with a zesty coriander mayo dip.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "195-195"
+        },
+        {
+          "name": "Chana Chaat",
+          "description": "A vibrant mix of boiled black gram, tangy spices, and house rub.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "275-275"
+        },
+        {
+          "name": "Chipotle Corn Bhel",
+          "description": "A smoky Mexican-inspired take on bhel puri with chipotle-kissed corn.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "295-295"
+        },
+        {
+          "name": "French Fries",
+          "description": "Choose from Classic Salted, Cajun, or Peri Peri seasoning.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "295-295"
+        },
+        {
+          "name": "Trio of Nachos",
+          "description": "Homemade nachos served with jalapeño salsa, sour cream, cheese sauce, and guacamole.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "545-545"
+        },
+        {
+          "name": "Onion Rings",
+          "description": "Perfectly breaded and fried to a golden crisp, served with sriracha aioli.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Steamed Momos",
+          "description": "Soft and juicy dumplings served with a spicy Schezwan sauce. Available veg or chicken.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "295-345"
+        },
+        {
+          "name": "Spring Roll",
+          "description": "Golden-fried crispy rolls stuffed with seasoned filling, served with sriracha sauce.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "325-325"
+        },
+        {
+          "name": "Coin Paneer Bhurji Patty",
+          "description": "Spiced paneer bhurji on crisp lachha paratha with mint mayo.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "395-395"
+        },
+        {
+          "name": "Chilli Paneer",
+          "description": "Fiery Calcutta-style paneer tossed in a bold, spicy glaze.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "425-425"
+        },
+        {
+          "name": "Mushroom Cheese Balls",
+          "description": "Golden-fried mushroom bites stuffed with jalapeño cheddar, served with truffle aioli.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "495-495"
+        },
+        {
+          "name": "Drums of Heaven",
+          "description": "Crispy chicken drumsticks coated in a tangy house-made sauce.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "445-445"
+        },
+        {
+          "name": "Calcutta Chilli Chicken",
+          "description": "Bold flavours of Calcutta in a spicy, smoky chicken dish.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "475-475"
+        },
+        {
+          "name": "Panko Crusted Cajun Chicken Strips",
+          "description": "Crispy Cajun-spiced chicken strips served with curry leaf mayo.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "475-475"
+        },
+        {
+          "name": "Chicken Meatball",
+          "description": "Juicy flavorful meatballs in a spiced gulkand tomato sauce.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "495-495"
+        },
+        {
+          "name": "Koliwada Fried Chicken",
+          "description": "Bombay koli-style crispy fried chicken paired with peri peri fries.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "545-545"
+        },
+        {
+          "name": "Butter Garlic Prawns",
+          "description": "Prawns in a fragrant butter garlic sauce, served with soft Bombay pav.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "625-625"
+        },
+        {
+          "name": "Beer Glazed Chicken Wings",
+          "description": "Crispy wings drenched in bold beer glaze. Choose from Bhut Jolokia Cider, Peri Peri Stout, Sriracha IPA or Barbeque Wheat.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "495-495"
+        },
+        {
+          "name": "Beer Battered Fish Fingers",
+          "description": "Crispy golden fish fingers served with tangy kasundi tartare sauce.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "545-545"
+        },
+        {
+          "name": "Paneer Tikka",
+          "description": "Soft, smoky paneer marinated in yogurt and spices, grilled to golden perfection.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "445-445"
+        },
+        {
+          "name": "Angara Chicken Tikka",
+          "description": "Spicy marinated chicken grilled to juicy perfection.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "495-495"
+        },
+        {
+          "name": "Afghani Chicken Tikka",
+          "description": "Smooth, creamy chicken slow-marinated in cashew and yogurt for a melt-in-your-mouth experience.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "525-525"
+        },
+        {
+          "name": "Chicken Seekh Kebab",
+          "description": "Tender, juicy seekh kebab packed with aromatic spices, grilled just right.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "495-495"
+        },
+        {
+          "name": "Peshawari Seekh Kebab",
+          "description": "Juicy minced mutton kebabs infused with aromatic spices in true Peshawari style.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "575-575"
+        },
+        {
+          "name": "Bombay Street Side Toast",
+          "description": "Spiced potato mash, grated cheese, and sev on crispy sourdough.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "345-345"
+        },
+        {
+          "name": "Mushroom on Toast",
+          "description": "Sourdough topped with shiitake and button mushrooms, parmesan, and balsamic drizzle.",
+          "category": "Snack",
+          "dietary": "veg",
+          "priceRange": "475-475"
+        },
+        {
+          "name": "Classic Margherita Pizza",
+          "description": "Fresh mozzarella, tomato, and fresh basil on a hand rolled base.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "395-525"
+        },
+        {
+          "name": "Four Cheese Pizza",
+          "description": "Mozzarella, Parmesan, Cheddar, and Gouda topped with fresh arugula.",
+          "category": "Main Course",
+          "dietary": "veg",
+          "priceRange": "445-595"
+        },
+        {
+          "name": "Chipotle Chicken Pizza",
+          "description": "Smoky chipotle chicken, creamy sour cream, and gooey cheese on hand rolled base.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "445-595"
+        },
+        {
+          "name": "Chicken Tikka Pizza",
+          "description": "Spiced chicken tikka meets cheesy, crispy pizza.",
+          "category": "Main Course",
+          "dietary": "non-veg",
+          "priceRange": "495-625"
+        },
+        {
+          "name": "TBC Caesar Salad",
+          "description": "Romaine lettuce, croutons and shaved parmesan. Add chicken for extra protein.",
+          "category": "Starter",
+          "dietary": "veg",
+          "priceRange": "445-475"
+        },
+        {
+          "name": "Chopped Thai Chicken Salad",
+          "description": "Fresh vibrant salad with chicken, toasted sesame, and zesty Thai dressing.",
+          "category": "Starter",
+          "dietary": "non-veg",
+          "priceRange": "425-425"
+        }
+      ]
+    }
+  ]
+}

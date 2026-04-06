@@ -1,0 +1,162 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ──────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // True only for requests made with a service-account / admin token.
+    // Admin SDK calls have request.auth.token.firebase.sign_in_provider == null
+    // or request.auth.uid set but no sign_in_provider. We rely on the fact that
+    // Firestore rules cannot distinguish admin SDK from client SDK — the real
+    // protection is field-level: client writes to sensitive fields are blocked.
+    // Server (admin SDK) bypasses rules entirely.
+
+    // Fields a user may set on their own profile via client SDK.
+    function isProfileUpdate() {
+      let allowed = ['displayName', 'avatarUrl', 'city', 'area', 'favoriteCuisines'].toSet();
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowed);
+    }
+
+    // ── Users ─────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Anyone can read public user profiles.
+      allow read: if true;
+
+      // Owner can create their own doc on first sign-in.
+      allow create: if isOwner(userId);
+
+      // Owner can update ONLY safe profile fields.
+      // isAdmin, isPremium, premiumSince, level, badges, reviewCount,
+      // helpfulVotesReceived are server-write-only (admin SDK bypasses rules).
+      allow update: if isOwner(userId) && isProfileUpdate();
+
+      // Users cannot delete their own doc from client.
+      allow delete: if false;
+
+      // ── Wishlist subcollection ────────────────────────────
+      match /wishlist/{dishId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId);
+      }
+
+      // ── Point transactions subcollection ────────────────
+      // Append-only ledger. Owner can read; only server writes.
+      match /pointTransactions/{txId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+
+      // ── Coupon claims subcollection ─────────────────────
+      // Owner can read their claimed coupons; only server writes.
+      match /couponClaims/{claimId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+    }
+
+    // ── Restaurants ───────────────────────────────────────────
+
+    match /restaurants/{restaurantId} {
+      // Public reads.
+      allow read: if true;
+
+      // No client writes. All mutations go through server API routes.
+      allow write: if false;
+
+      // Analytics cache subcollection — readable by authenticated users,
+      // writable only by server (admin SDK bypasses rules).
+      match /cache/{doc} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+    }
+
+    // ── Dishes ────────────────────────────────────────────────
+
+    match /dishes/{dishId} {
+      // Public reads.
+      allow read: if true;
+
+      // No client writes. Created/updated via server transactions.
+      allow write: if false;
+    }
+
+    // ── Reviews ───────────────────────────────────────────────
+
+    match /reviews/{reviewId} {
+      // Public reads.
+      allow read: if true;
+
+      // All mutations via server API routes only (admin SDK bypasses rules).
+      allow write: if false;
+    }
+
+    // ── Dish Requests ─────────────────────────────────────────
+
+    match /dishRequests/{requestId} {
+      // Authenticated users can read dish requests.
+      allow read: if isSignedIn();
+
+      // Authenticated user can create a request with their own userId.
+      allow create: if isSignedIn()
+                    && request.resource.data.requestedBy == request.auth.uid;
+
+      // Status updates (approve/reject) are server-only via admin API routes.
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ── Coupons ─────────────────────────────────────────────
+
+    match /coupons/{couponId} {
+      // Authenticated users can browse available coupons.
+      allow read: if isSignedIn();
+
+      // Coupon management is server-only (admin SDK).
+      allow write: if false;
+    }
+
+    // ── Restaurant Claims ────────────────────────────────────
+
+    match /restaurantClaims/{claimId} {
+      // Owner can read their own claim. Admin UI fetches via admin SDK (bypasses rules).
+      allow read: if isSignedIn()
+                  && resource.data.userId == request.auth.uid;
+
+      // Authenticated user can create a claim with their own userId.
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+
+      // Status updates (approve/reject) are server-only via admin API routes.
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ── Notifications ─────────────────────────────────────────
+
+    match /notifications/{notificationId} {
+      // Owner can read their own notifications.
+      allow read: if isSignedIn()
+                  && resource.data.userId == request.auth.uid;
+
+      // Client can only mark notifications as read (update isRead field).
+      allow update: if isSignedIn()
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead'].toSet());
+
+      // Notifications are created server-side only.
+      allow create: if false;
+      allow delete: if false;
+    }
+  }
+}

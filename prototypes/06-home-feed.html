@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DishCheck — Home Feed Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #E23744; --color-primary-dark: #C62D39;
+      --color-secondary: #FF6B35; --color-accent: #FFB800;
+      --color-accent-light: #FFF0C2; --color-success: #48C479;
+      --color-bg: #FFFFFF; --color-bg-warm: #FFF8F0;
+      --color-bg-cream: #FFFAF5; --color-bg-dark: #1C1C2B;
+      --color-text: #2D2D3A; --color-text-secondary: #6B7280;
+      --color-text-muted: #9CA3AF; --color-border: #F0F0F0;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 24px; --radius-pill: 999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+      --shadow-glow: 0 4px 20px rgba(226,55,68,0.25);
+      --font-display: 'Fredoka', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); color: var(--color-text); background: #F7F7F8; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; cursor: pointer; font-family: inherit; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease-smooth), transform 0.6s var(--ease-smooth); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; } .reveal-delay-2 { transition-delay: 0.2s; } .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Navbar */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: var(--shadow-sm); }
+    .navbar-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 24px; color: var(--color-primary); }
+    .nav-logo svg { width: 34px; height: 34px; }
+    .nav-search { flex: 1; max-width: 480px; position: relative; display: none; }
+    @media (min-width: 768px) { .nav-search { display: block; } }
+    .nav-search input { width: 100%; height: 42px; border: 2px solid var(--color-border); border-radius: var(--radius-pill); padding: 0 16px 0 44px; font-size: 14px; font-family: var(--font-body); background: var(--color-bg-cream); outline: none; transition: border-color 0.2s; }
+    .nav-search input:focus { border-color: var(--color-primary); }
+    .nav-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-notif { width: 42px; height: 42px; border-radius: 50%; background: var(--color-bg-cream); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); position: relative; cursor: pointer; transition: border-color 0.2s; }
+    .nav-notif:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .nav-notif-dot { position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); border: 2px solid white; }
+    .nav-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px; cursor: pointer; border: 2px solid white; box-shadow: var(--shadow-sm); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; border-radius: var(--radius-pill); padding: 10px 24px; transition: all 0.25s var(--ease-smooth); white-space: nowrap; }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+    .btn-outline { background: transparent; color: var(--color-text); border: 2px solid var(--color-border); }
+    .btn-outline:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Greeting */
+    .greeting-section { padding: 88px 0 0; }
+    .greeting { padding: 32px 0 24px; }
+    .greeting-text { font-family: var(--font-display); font-size: clamp(24px, 3.5vw, 32px); font-weight: 700; color: var(--color-bg-dark); }
+    .greeting-sub { font-size: 15px; color: var(--color-text-secondary); margin-top: 4px; }
+
+    /* Quick Actions */
+    .quick-actions { display: flex; gap: 12px; padding-bottom: 28px; overflow-x: auto; scrollbar-width: none; }
+    .quick-actions::-webkit-scrollbar { display: none; }
+    .quick-action { flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: var(--radius-lg); background: white; border: 1px solid var(--color-border); cursor: pointer; transition: all 0.2s; }
+    .quick-action:hover { border-color: transparent; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .quick-action-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .quick-action-text { font-weight: 600; font-size: 14px; }
+    .quick-action-sub { font-size: 12px; color: var(--color-text-muted); }
+
+    /* Section */
+    .feed-section { padding: 28px 0; }
+    .section-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+    .section-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--color-bg-dark); }
+    .see-all { font-size: 14px; font-weight: 600; color: var(--color-primary); display: inline-flex; align-items: center; gap: 4px; transition: gap 0.2s; flex-shrink: 0; }
+    .see-all:hover { gap: 8px; }
+
+    /* Trending Scroll */
+    .trending-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+    .trending-scroll::-webkit-scrollbar { display: none; }
+
+    .dish-card { flex: 0 0 240px; background: white; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); transition: all 0.3s var(--ease-smooth); cursor: pointer; }
+    .dish-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: transparent; }
+    .dish-card-img { height: 140px; position: relative; }
+    .dish-card-rating { position: absolute; top: 10px; right: 10px; background: var(--color-success); color: white; padding: 3px 8px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; }
+    .dish-card-body { padding: 14px; }
+    .dish-card-name { font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+    .dish-card-meta { font-size: 12px; color: var(--color-text-muted); }
+    .dish-card-price { font-weight: 700; font-size: 14px; margin-top: 8px; }
+
+    /* For You / Recommended */
+    .reco-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 640px) { .reco-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .reco-grid { grid-template-columns: repeat(3, 1fr); } }
+    .reco-card { display: flex; gap: 14px; background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: 16px; transition: all 0.2s; cursor: pointer; }
+    .reco-card:hover { box-shadow: var(--shadow-md); border-color: transparent; transform: translateY(-2px); }
+    .reco-img { width: 80px; height: 80px; border-radius: var(--radius-md); flex-shrink: 0; }
+    .reco-name { font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+    .reco-restaurant { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+    .reco-bottom { display: flex; align-items: center; gap: 10px; }
+    .reco-rating { font-size: 12px; font-weight: 700; color: var(--color-success); display: flex; align-items: center; gap: 3px; }
+    .reco-price { font-size: 12px; color: var(--color-text-muted); }
+    .reco-tag { padding: 2px 8px; border-radius: var(--radius-pill); font-size: 10px; font-weight: 600; background: rgba(226,55,68,0.08); color: var(--color-primary); }
+
+    /* Activity Feed */
+    .activity-list { display: flex; flex-direction: column; gap: 12px; }
+    .activity-card { display: flex; gap: 14px; background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: 16px; transition: all 0.2s; }
+    .activity-card:hover { box-shadow: var(--shadow-sm); }
+    .activity-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 16px; flex-shrink: 0; }
+    .activity-text { font-size: 14px; line-height: 1.5; }
+    .activity-text strong { font-weight: 600; }
+    .activity-text .dish-link { color: var(--color-primary); font-weight: 600; }
+    .activity-time { font-size: 12px; color: var(--color-text-muted); margin-top: 4px; }
+    .activity-preview { width: 60px; height: 60px; border-radius: var(--radius-sm); flex-shrink: 0; margin-left: auto; }
+
+    /* Stats Banner */
+    .stats-banner { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border-radius: var(--radius-xl); padding: 28px; color: white; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .stats-banner-text { flex: 1; min-width: 200px; }
+    .stats-banner-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .stats-banner-sub { font-size: 14px; opacity: 0.8; }
+    .stats-banner-numbers { display: flex; gap: 24px; }
+    .stats-banner-stat { text-align: center; }
+    .stats-banner-num { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+    .stats-banner-label { font-size: 11px; opacity: 0.7; }
+    .stats-banner .btn { background: white; color: var(--color-primary); font-weight: 700; }
+    .stats-banner .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+
+    /* Cuisine Quick Browse */
+    .cuisine-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+    .cuisine-scroll::-webkit-scrollbar { display: none; }
+    .cuisine-pill { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--radius-pill); background: white; border: 1px solid var(--color-border); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .cuisine-pill:hover { border-color: var(--color-primary); color: var(--color-primary); transform: translateY(-1px); }
+    .cuisine-pill-emoji { font-size: 20px; }
+
+    /* Mobile nav */
+    .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); border-top: 1px solid var(--color-border); z-index: 100; padding: 6px 0 max(6px, env(safe-area-inset-bottom)); }
+    @media (min-width: 768px) { .mobile-nav { display: none; } }
+    .mobile-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; font-size: 10px; font-weight: 500; color: var(--color-text-muted); background: none; }
+    .mobile-nav-item.active { color: var(--color-primary); }
+    .mobile-nav-item svg { width: 22px; height: 22px; }
+    .review-btn-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; margin-top: -22px; box-shadow: var(--shadow-glow); }
+    @media (max-width: 767px) { body { padding-bottom: 70px; } }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar (logged in) -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="nav-logo" href="01-landing.html">
+        <svg viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="10" fill="#E23744"/><path d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z" fill="white" opacity="0.9"/><path d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z" fill="white" opacity="0.7"/><circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9"/></svg>
+        DishCheck
+      </a>
+      <div class="nav-search">
+        <svg class="nav-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" placeholder="Search for a dish or restaurant...">
+      </div>
+      <div class="nav-right">
+        <a href="05-write-review.html" class="btn btn-primary" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Review
+        </a>
+        <div class="nav-notif">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <div class="nav-notif-dot"></div>
+        </div>
+        <div class="nav-avatar">A</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Greeting -->
+  <section class="greeting-section">
+    <div class="container">
+      <div class="greeting reveal">
+        <div class="greeting-text">Good afternoon, Aanya! 👋</div>
+        <div class="greeting-sub">What are you craving today?</div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions reveal">
+        <a href="02-explore.html" class="quick-action">
+          <div class="quick-action-icon" style="background:linear-gradient(135deg,#FEE2E2,#FECDD3)">🔍</div>
+          <div>
+            <div class="quick-action-text">Explore Dishes</div>
+            <div class="quick-action-sub">Browse by cuisine</div>
+          </div>
+        </a>
+        <a href="05-write-review.html" class="quick-action">
+          <div class="quick-action-icon" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A)">✍️</div>
+          <div>
+            <div class="quick-action-text">Write a Review</div>
+            <div class="quick-action-sub">Share your take</div>
+          </div>
+        </a>
+        <a href="#" class="quick-action">
+          <div class="quick-action-icon" style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0)">❤️</div>
+          <div>
+            <div class="quick-action-text">Your Wishlist</div>
+            <div class="quick-action-sub">3 dishes saved</div>
+          </div>
+        </a>
+        <a href="#" class="quick-action">
+          <div class="quick-action-icon" style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE)">🏆</div>
+          <div>
+            <div class="quick-action-text">Your Profile</div>
+            <div class="quick-action-sub">Level 3 • 42 reviews</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Your Stats -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="stats-banner reveal">
+        <div class="stats-banner-text">
+          <div class="stats-banner-title">You're on a roll! 🔥</div>
+          <div class="stats-banner-sub">3 reviews this week. Keep going to reach Level 4!</div>
+        </div>
+        <div class="stats-banner-numbers">
+          <div class="stats-banner-stat">
+            <div class="stats-banner-num">42</div>
+            <div class="stats-banner-label">Reviews</div>
+          </div>
+          <div class="stats-banner-stat">
+            <div class="stats-banner-num">156</div>
+            <div class="stats-banner-label">Helpful</div>
+          </div>
+          <div class="stats-banner-stat">
+            <div class="stats-banner-num">8</div>
+            <div class="stats-banner-label">Badges</div>
+          </div>
+        </div>
+        <a href="#" class="btn">View Profile</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trending Near You -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="section-top-row reveal">
+        <h2 class="section-title">🔥 Trending Near You</h2>
+        <a href="02-explore.html" class="see-all">See all <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a>
+      </div>
+      <div class="trending-scroll">
+        <div class="dish-card reveal">
+          <div class="dish-card-img" style="background:linear-gradient(135deg,#FECDD3,#FDA4AF)"><div class="dish-card-rating">★ 4.8</div></div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Hyderabadi Dum Biryani</div>
+            <div class="dish-card-meta">Paradise • Indiranagar</div>
+            <div class="dish-card-price">₹350</div>
+          </div>
+        </div>
+        <div class="dish-card reveal reveal-delay-1">
+          <div class="dish-card-img" style="background:linear-gradient(135deg,#FDE68A,#FCD34D)"><div class="dish-card-rating">★ 4.7</div></div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Ghee Roast Dosa</div>
+            <div class="dish-card-meta">MTR • Lalbagh Road</div>
+            <div class="dish-card-price">₹180</div>
+          </div>
+        </div>
+        <div class="dish-card reveal reveal-delay-2">
+          <div class="dish-card-img" style="background:linear-gradient(135deg,#A7F3D0,#6EE7B7)"><div class="dish-card-rating">★ 4.9</div></div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Tonkotsu Ramen</div>
+            <div class="dish-card-meta">Ichiraku • Koramangala</div>
+            <div class="dish-card-price">₹480</div>
+          </div>
+        </div>
+        <div class="dish-card reveal reveal-delay-3">
+          <div class="dish-card-img" style="background:linear-gradient(135deg,#DDD6FE,#C4B5FD)"><div class="dish-card-rating">★ 4.5</div></div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Death by Chocolate</div>
+            <div class="dish-card-meta">Corner House • Jayanagar</div>
+            <div class="dish-card-price">₹220</div>
+          </div>
+        </div>
+        <div class="dish-card reveal">
+          <div class="dish-card-img" style="background:linear-gradient(135deg,#FBCFE8,#F9A8D4)"><div class="dish-card-rating">★ 4.6</div></div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Truffle Pizza</div>
+            <div class="dish-card-meta">Toit • Indiranagar</div>
+            <div class="dish-card-price">₹550</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Browse Cuisines -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="section-top-row reveal">
+        <h2 class="section-title">Browse by Cuisine</h2>
+      </div>
+      <div class="cuisine-scroll reveal">
+        <a href="02-explore.html" class="cuisine-pill"><span class="cuisine-pill-emoji">🍛</span> North Indian</a>
+        <a href="02-explore.html" class="cuisine-pill"><span class="cuisine-pill-emoji">🫓</span> South Indian</a>
+        <a href="02-explore.html" class="cuisine-pill"><span class="cuisine-pill-emoji">🍕</span> Italian</a>
+        <a href="02-explore.html" class="cuisine-pill"><span class="cuisine-pill-emoji">🍜</span> Chinese</a>
+        <a href="02-explore.html" class="cuisine-pill"><span class="cuisine-pill-emoji">🍣</span> Japanese</a>
+        <a href="02-explore.html" class="cuisine-pill"><span class="cuisine-pill-emoji">🌮</span> Mexican</a>
+        <a href="02-explore.html" class="cuisine-pill"><span class="cuisine-pill-emoji">🍰</span> Desserts</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recommended For You -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="section-top-row reveal">
+        <h2 class="section-title">🎯 Recommended For You</h2>
+        <a href="02-explore.html" class="see-all">See all <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a>
+      </div>
+      <div class="reco-grid">
+        <div class="reco-card reveal">
+          <div class="reco-img" style="background:linear-gradient(135deg,#FECDD3,#FCA5A5)"></div>
+          <div>
+            <div class="reco-name">Chicken 65</div>
+            <div class="reco-restaurant">Meghana Foods • HSR</div>
+            <div class="reco-bottom">
+              <span class="reco-rating">★ 4.6</span>
+              <span class="reco-price">₹280</span>
+              <span class="reco-tag">Spicy</span>
+            </div>
+          </div>
+        </div>
+        <div class="reco-card reveal reveal-delay-1">
+          <div class="reco-img" style="background:linear-gradient(135deg,#FDE68A,#FBBF24)"></div>
+          <div>
+            <div class="reco-name">Paneer Butter Masala</div>
+            <div class="reco-restaurant">Punjab Grill • Koramangala</div>
+            <div class="reco-bottom">
+              <span class="reco-rating">★ 4.4</span>
+              <span class="reco-price">₹350</span>
+              <span class="reco-tag">Rich</span>
+            </div>
+          </div>
+        </div>
+        <div class="reco-card reveal reveal-delay-2">
+          <div class="reco-img" style="background:linear-gradient(135deg,#C4B5FD,#A78BFA)"></div>
+          <div>
+            <div class="reco-name">Tiramisu</div>
+            <div class="reco-restaurant">Café Azzure • Indiranagar</div>
+            <div class="reco-bottom">
+              <span class="reco-rating">★ 4.7</span>
+              <span class="reco-price">₹320</span>
+              <span class="reco-tag">Dessert</span>
+            </div>
+          </div>
+        </div>
+        <div class="reco-card reveal">
+          <div class="reco-img" style="background:linear-gradient(135deg,#BFDBFE,#93C5FD)"></div>
+          <div>
+            <div class="reco-name">Fish & Chips</div>
+            <div class="reco-restaurant">The Permit Room • MG Road</div>
+            <div class="reco-bottom">
+              <span class="reco-rating">★ 4.3</span>
+              <span class="reco-price">₹450</span>
+              <span class="reco-tag">Crispy</span>
+            </div>
+          </div>
+        </div>
+        <div class="reco-card reveal reveal-delay-1">
+          <div class="reco-img" style="background:linear-gradient(135deg,#D1FAE5,#6EE7B7)"></div>
+          <div>
+            <div class="reco-name">Chettinad Chicken</div>
+            <div class="reco-restaurant">Nagarjuna • Residency Rd</div>
+            <div class="reco-bottom">
+              <span class="reco-rating">★ 4.8</span>
+              <span class="reco-price">₹320</span>
+              <span class="reco-tag">Must Try</span>
+            </div>
+          </div>
+        </div>
+        <div class="reco-card reveal reveal-delay-2">
+          <div class="reco-img" style="background:linear-gradient(135deg,#FBCFE8,#F9A8D4)"></div>
+          <div>
+            <div class="reco-name">Margherita Pizza</div>
+            <div class="reco-restaurant">Onesta • JP Nagar</div>
+            <div class="reco-bottom">
+              <span class="reco-rating">★ 4.2</span>
+              <span class="reco-price">₹250</span>
+              <span class="reco-tag">Classic</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Activity -->
+  <section class="feed-section" style="padding-bottom:60px">
+    <div class="container">
+      <div class="section-top-row reveal">
+        <h2 class="section-title">📢 Recent Activity</h2>
+      </div>
+      <div class="activity-list">
+        <div class="activity-card reveal">
+          <div class="activity-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6366F1)">R</div>
+          <div style="flex:1">
+            <div class="activity-text"><strong>Rahul Menon</strong> reviewed <span class="dish-link">Hyderabadi Dum Biryani</span> at Paradise Biryani</div>
+            <div class="activity-time">2 hours ago • ★★★★☆</div>
+          </div>
+          <div class="activity-preview" style="background:linear-gradient(135deg,#FECDD3,#FDA4AF)"></div>
+        </div>
+        <div class="activity-card reveal reveal-delay-1">
+          <div class="activity-avatar" style="background:linear-gradient(135deg,var(--color-success),#34D399)">P</div>
+          <div style="flex:1">
+            <div class="activity-text"><strong>Priya Patel</strong> earned the badge <span class="dish-link">🍰 Dessert Explorer</span></div>
+            <div class="activity-time">5 hours ago</div>
+          </div>
+        </div>
+        <div class="activity-card reveal reveal-delay-2">
+          <div class="activity-avatar" style="background:linear-gradient(135deg,var(--color-accent),#F59E0B)">K</div>
+          <div style="flex:1">
+            <div class="activity-text"><strong>Karthik Rao</strong> reviewed <span class="dish-link">Tonkotsu Ramen</span> at Ichiraku</div>
+            <div class="activity-time">8 hours ago • ★★★★★</div>
+          </div>
+          <div class="activity-preview" style="background:linear-gradient(135deg,#A7F3D0,#6EE7B7)"></div>
+        </div>
+        <div class="activity-card reveal reveal-delay-3">
+          <div class="activity-avatar" style="background:linear-gradient(135deg,#F472B6,#EC4899)">S</div>
+          <div style="flex:1">
+            <div class="activity-text"><strong>Sneha Kumar</strong> saved <span class="dish-link">Ghee Roast Dosa</span> to wishlist</div>
+            <div class="activity-time">12 hours ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile Nav -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+    <button class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Explore</button>
+    <button class="mobile-nav-item"><div class="review-btn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>Review</button>
+    <button class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Saved</button>
+    <button class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+  </nav>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

@@ -4,31 +4,34 @@ import type { Restaurant } from '@/lib/types'
 
 interface RestaurantCardProps {
   restaurant: Restaurant
+  index?: number
 }
 
-export function RestaurantCard({ restaurant }: RestaurantCardProps) {
+export function RestaurantCard({ restaurant, index = 0 }: RestaurantCardProps) {
   return (
     <Link
       href={`/restaurant/${restaurant.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-md hover:ring-brand/30"
+      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-1.5 hover:border-transparent hover:shadow-lg active:translate-y-0 active:shadow-md animate-pop-in"
+      style={{ animationDelay: `${Math.min(index, 8) * 60}ms`, animationFillMode: 'both' }}
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+      <div className="relative h-32 w-full overflow-hidden bg-bg-cream">
         {restaurant.coverImage ? (
           <Image
             src={restaurant.coverImage}
             alt={restaurant.name}
             fill
-            className="object-cover transition duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-[1.06]"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-4xl text-gray-300">🏪</div>
+          <div className="flex h-full items-center justify-center text-4xl">🏪</div>
         )}
       </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900 line-clamp-1">{restaurant.name}</h3>
-        <p className="mt-0.5 text-xs text-gray-500">{restaurant.area}, {restaurant.city}</p>
+      <div className="p-3.5">
+        <h3 className="font-display font-semibold text-bg-dark line-clamp-1">{restaurant.name}</h3>
+        <p className="mt-0.5 text-xs text-text-muted">{restaurant.area}, {restaurant.city}</p>
         {restaurant.cuisines.length > 0 && (
-          <p className="mt-1 text-xs text-gray-400 line-clamp-1">{restaurant.cuisines.join(' · ')}</p>
+          <p className="mt-1.5 text-xs text-text-secondary line-clamp-1">{restaurant.cuisines.join(' · ')}</p>
         )}
       </div>
     </Link>

@@ -2,69 +2,67 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Dish } from '@/lib/types'
 import { formatRating } from '@/lib/utils/index'
-import { TagCloud } from '@/components/ui/TagCloud'
-
-const DIETARY_ICON: Record<string, string> = {
-  veg: '🟢',
-  'non-veg': '🔴',
-  egg: '🟡',
-}
-
-const PRICE_LABEL: Record<string, string> = {
-  'under-100': '< ₹100',
-  '100-200': '₹100–200',
-  '200-400': '₹200–400',
-  '400-600': '₹400–600',
-  'above-600': '> ₹600',
-}
+import { cn } from '@/lib/utils'
+import { getCuisineEmoji, getCuisineGradient } from '@/lib/utils/dish-display'
+import { PRICE_LABEL, DIETARY_ICON } from '@/lib/constants'
 
 interface DishCardProps {
   dish: Dish
+  index?: number
 }
 
-export function DishCard({ dish }: DishCardProps) {
+export function DishCard({ dish, index = 0 }: DishCardProps) {
   return (
     <Link
-      href={`/restaurant/${dish.restaurantId}/dish/${dish.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition hover:shadow-md hover:ring-brand/30"
+      href={`/dish/${dish.id}`}
+      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-1.5 hover:border-transparent hover:shadow-lg active:translate-y-0 active:shadow-md animate-pop-in"
+      style={{ animationDelay: `${Math.min(index, 8) * 60}ms`, animationFillMode: 'both' }}
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+      <div className="relative h-36 w-full overflow-hidden bg-bg-cream">
         {dish.coverImage ? (
           <Image
             src={dish.coverImage}
             alt={dish.name}
             fill
-            className="object-cover transition duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-[1.06]"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-4xl text-gray-300">🍽️</div>
+          <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+            <div className={cn("absolute inset-0", getCuisineGradient(dish.cuisines?.[0]))} />
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage: `radial-gradient(circle at 20% 50%, white 1px, transparent 1px),
+                                  radial-gradient(circle at 80% 50%, white 1px, transparent 1px)`,
+                backgroundSize: '30px 30px',
+              }}
+            />
+            <div className="relative flex flex-col items-center gap-2">
+              <span className="text-5xl drop-shadow-sm">
+                {getCuisineEmoji(dish.cuisines?.[0])}
+              </span>
+            </div>
+          </div>
         )}
-        <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-amber-600 shadow-sm">
-          ⭐ {formatRating(dish.avgOverall)}
+        <div className="absolute right-2.5 top-2.5 flex items-center gap-1 rounded-sm bg-success px-2 py-0.5 text-xs font-bold text-white">
+          ★ {formatRating(dish.avgOverall)}
         </div>
         {dish.dietary && (
-          <div className="absolute left-2 top-2 rounded-full bg-white/90 p-0.5 text-sm shadow-sm">
-            {DIETARY_ICON[dish.dietary]}
+          <div className="absolute left-2.5 top-2.5 rounded-sm bg-card/90 px-1.5 py-0.5 text-xs font-medium shadow-sm backdrop-blur-sm">
+            {DIETARY_ICON[dish.dietary] ?? dish.dietary}
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="font-semibold text-gray-900 line-clamp-1">{dish.name}</h3>
-        <p className="mt-0.5 text-xs text-gray-500 line-clamp-1">{dish.restaurantName}</p>
-        {dish.description && (
-          <p className="mt-1 text-xs text-gray-400 line-clamp-2">{dish.description}</p>
-        )}
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-xs text-gray-400">{dish.reviewCount} reviews</span>
+      <div className="flex flex-1 flex-col p-3.5">
+        <h3 className="font-display font-semibold text-bg-dark line-clamp-1">{dish.name}</h3>
+        <p className="mt-0.5 text-xs text-text-muted line-clamp-1">{dish.restaurantName}</p>
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <span className="text-xs text-text-muted">{dish.reviewCount} reviews</span>
           {dish.priceRange && (
-            <span className="text-xs font-medium text-gray-600">{PRICE_LABEL[dish.priceRange]}</span>
+            <span className="text-sm font-bold text-bg-dark">{PRICE_LABEL[dish.priceRange]}</span>
           )}
         </div>
-        {dish.topTags.length > 0 && (
-          <div className="mt-3">
-            <TagCloud tags={dish.topTags} maxVisible={3} />
-          </div>
-        )}
       </div>
     </Link>
   )

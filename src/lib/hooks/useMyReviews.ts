@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getReviewsByUser } from '@/lib/firebase/reviews'
+import { getReviewsByUser } from '@/lib/services/reviews'
 import { useAuth } from './useAuth'
 
 export function useMyReviews() {

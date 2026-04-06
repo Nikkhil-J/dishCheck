@@ -1,5 +1,7 @@
 'use client'
 
+import { cn } from '@/lib/utils'
+
 interface TagPillProps {
   label: string
   selected?: boolean
@@ -13,12 +15,12 @@ export function TagPill({ label, selected = false, onClick, disabled = false }: 
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={[
-        'rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
+      className={cn(
+        'rounded-pill border-2 px-4 py-1.5 text-xs font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
         selected
-          ? 'border-emerald-600 bg-emerald-600 text-white'
-          : 'border-gray-300 bg-white text-gray-600 hover:border-emerald-400 hover:text-emerald-600',
-      ].join(' ')}
+          ? 'border-primary bg-primary text-white'
+          : 'border-border bg-card text-text-secondary hover:border-primary hover:text-primary'
+      )}
     >
       {label}
     </button>

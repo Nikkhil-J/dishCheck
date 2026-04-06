@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { collection, getCountFromServer, query, where } from 'firebase/firestore'
-import { db, COLLECTIONS } from '@/lib/firebase/config'
+import { getAdminStats } from '@/lib/services/admin'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import type { AdminStats } from '@/lib/types'
 
@@ -11,33 +10,21 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function load() {
-      try {
-        const [restaurants, dishes, reviews, pending, flagged, users] = await Promise.all([
-          getCountFromServer(query(collection(db, COLLECTIONS.RESTAURANTS), where('isActive', '==', true))),
-          getCountFromServer(query(collection(db, COLLECTIONS.DISHES), where('isActive', '==', true))),
-          getCountFromServer(collection(db, COLLECTIONS.REVIEWS)),
-          getCountFromServer(query(collection(db, COLLECTIONS.DISH_REQUESTS), where('status', '==', 'pending'))),
-          getCountFromServer(query(collection(db, COLLECTIONS.REVIEWS), where('isFlagged', '==', true))),
-          getCountFromServer(collection(db, COLLECTIONS.USERS)),
-        ])
-        setStats({
-          totalRestaurants: restaurants.data().count,
-          totalDishes: dishes.data().count,
-          totalReviews: reviews.data().count,
-          pendingRequests: pending.data().count,
-          flaggedReviews: flagged.data().count,
-          totalUsers: users.data().count,
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
+    getAdminStats()
+      .then(setStats)
+      .finally(() => setLoading(false))
   }, [])
 
   if (loading) return <div className="flex justify-center py-20"><LoadingSpinner /></div>
-  if (!stats) return null
+  if (!stats) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-5xl">⚠️</p>
+        <p className="mt-4 font-display text-lg font-bold text-bg-dark">Failed to load stats</p>
+        <p className="mt-1 text-sm text-text-secondary">Please refresh the page or try again later.</p>
+      </div>
+    )
+  }
 
   const cards = [
     { label: 'Restaurants', value: stats.totalRestaurants, icon: '🏪' },
@@ -50,15 +37,15 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+      <h1 className="font-display text-xl font-bold text-bg-dark">Dashboard</h1>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map(({ label, value, icon, highlight }) => (
-          <div key={label} className={`rounded-xl border p-5 ${highlight ? 'border-amber-200 bg-amber-50' : 'border-gray-100 bg-white'}`}>
+          <div key={label} className={`rounded-xl border p-5 ${highlight ? 'border-[var(--color-accent)]/30 bg-[var(--color-accent-light)]' : 'border-border bg-card'}`}>
             <div className="flex items-center justify-between">
               <span className="text-2xl">{icon}</span>
-              <span className={`text-2xl font-bold ${highlight ? 'text-amber-700' : 'text-gray-900'}`}>{value}</span>
+              <span className={`font-display text-2xl font-bold ${highlight ? 'text-[var(--color-accent)]' : 'text-bg-dark'}`}>{value}</span>
             </div>
-            <p className="mt-2 text-sm text-gray-500">{label}</p>
+            <p className="mt-2 text-sm text-text-muted">{label}</p>
           </div>
         ))}
       </div>

@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { getReviewsByUser } from '@/lib/firebase/reviews'
+import { useMyReviews } from '@/lib/hooks/useMyReviews'
 import { BADGE_DEFINITIONS, LEVEL_THRESHOLDS } from '@/lib/constants'
 import { ReviewCard } from '@/components/features/ReviewCard'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -13,18 +13,32 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import type { Review } from '@/lib/types'
 
 export default function MyProfilePage() {
-  const { user } = useAuth()
+  const { user, authUser } = useAuth()
   const router = useRouter()
-  const [reviews, setReviews] = useState<Review[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+  const { data: reviews = [], isLoading: loading } = useMyReviews()
 
-  useEffect(() => {
-    if (!user) return
-    getReviewsByUser(user.id).then((r) => {
-      setReviews(r.items)
-      setLoading(false)
-    })
-  }, [user])
+  function handleEdit(review: Review) {
+    router.push(`/write-review?dishId=${review.dishId}&restaurantId=${review.restaurantId}&editReviewId=${review.id}`)
+  }
+
+  async function handleDelete(review: Review) {
+    if (!user || !authUser) return
+    const token = await authUser.getIdToken()
+    const confirmed = window.confirm('Delete this review? This cannot be undone.')
+    if (!confirmed) return
+
+    try {
+      const res = await fetch(`/api/reviews/${encodeURIComponent(review.id)}?dishId=${encodeURIComponent(review.dishId)}`, {
+        method: 'DELETE',
+        headers: { authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Delete failed')
+      await queryClient.invalidateQueries({ queryKey: ['my-reviews'] })
+    } catch {
+      alert('Failed to delete review. Please try again.')
+    }
+  }
 
   if (!user) return null
 
@@ -39,75 +53,94 @@ export default function MyProfilePage() {
     : 100
 
   const earnedBadges = BADGE_DEFINITIONS.filter((b) => user.badges.includes(b.id))
+  const allBadges = BADGE_DEFINITIONS.map((b) => ({
+    ...b,
+    earned: user.badges.includes(b.id),
+  }))
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      {/* Profile header */}
-      <div className="flex items-center gap-4">
-        {user.avatarUrl ? (
-          <Image src={user.avatarUrl} alt={user.displayName} width={72} height={72} className="rounded-full object-cover" />
-        ) : (
-          <div className="flex h-18 w-18 items-center justify-center rounded-full bg-brand-light text-2xl font-bold text-brand">
-            {user.displayName[0]?.toUpperCase()}
-          </div>
-        )}
-        <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">{user.displayName}</h1>
-          <p className="text-sm text-gray-500">{user.city || 'Bengaluru'}</p>
-          <span className="mt-1 inline-block rounded-full bg-brand-light px-2.5 py-0.5 text-xs font-semibold text-brand-dark">
-            {user.level}
-          </span>
+    <div className="mx-auto max-w-2xl px-6 py-8">
+      {/* Header */}
+      <div className="text-center">
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-background bg-gradient-to-br from-primary to-secondary shadow-lg">
+          {user.avatarUrl ? (
+            <Image src={user.avatarUrl} alt={user.displayName} width={96} height={96} className="rounded-full object-cover" />
+          ) : (
+            <span className="font-display text-3xl font-bold text-white">
+              {user.displayName[0]?.toUpperCase()}
+            </span>
+          )}
         </div>
-        <Link href="/settings" className="rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50">
-          Edit profile
-        </Link>
+        <h1 className="mt-4 font-display text-2xl font-bold text-bg-dark">{user.displayName}</h1>
+        <p className="mt-1 text-sm text-text-muted">{user.city || 'Bengaluru'}</p>
+        <div className="mt-3 inline-flex items-center gap-1.5 rounded-pill bg-accent-light px-4 py-1.5 text-sm font-bold text-[var(--color-accent)]">
+          ⭐ {user.level}
+        </div>
+        <div className="mt-4 flex justify-center gap-3">
+          <Link href="/settings" className="rounded-pill border-2 border-border px-5 py-2 text-sm font-semibold text-text-primary transition-colors hover:border-primary hover:text-primary">
+            Edit Profile
+          </Link>
+        </div>
       </div>
 
-      {/* Stats row */}
-      <div className="mt-6 grid grid-cols-3 gap-3">
+      {/* Stats */}
+      <div className="mt-8 flex overflow-hidden rounded-xl border border-border bg-card">
         {[
           { label: 'Reviews', value: user.reviewCount },
-          { label: 'Helpful votes', value: user.helpfulVotesReceived },
+          { label: 'Helpful', value: user.helpfulVotesReceived },
           { label: 'Badges', value: earnedBadges.length },
-        ].map(({ label, value }) => (
-          <div key={label} className="rounded-xl bg-gray-50 p-4 text-center">
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
-            <p className="text-xs text-gray-500">{label}</p>
+        ].map(({ label, value }, i) => (
+          <div key={label} className={`flex-1 py-5 text-center ${i < 2 ? 'border-r border-border' : ''}`}>
+            <div className="font-display text-2xl font-bold text-bg-dark">{value}</div>
+            <div className="text-xs text-text-muted">{label}</div>
           </div>
         ))}
       </div>
 
       {/* Level progress */}
-      <div className="mt-6 rounded-xl border border-gray-100 bg-white p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Level progress</span>
-          <span className="text-xs text-gray-400">
-            {nextLevel ? `${user.reviewCount} / ${nextThreshold} reviews to ${nextLevel}` : 'Max level reached!'}
+      <div className="mt-6 rounded-xl border border-border bg-card p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="font-display font-semibold text-bg-dark">Level Progress</span>
+          <span className="text-xs text-text-muted">
+            {nextLevel ? `${nextThreshold! - user.reviewCount} more to ${nextLevel}` : 'Max level!'}
           </span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-          <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${progress}%` }} />
+        <div className="h-3 w-full overflow-hidden rounded-full bg-border">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-700"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="mt-2 flex justify-between text-xs text-text-muted">
+          <span>{user.reviewCount}{nextThreshold ? ` / ${nextThreshold}` : ''} reviews</span>
+          {nextLevel && <span>{nextLevel}</span>}
         </div>
       </div>
 
       {/* Badges */}
-      {earnedBadges.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-sm font-semibold text-gray-700">Badges</h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {earnedBadges.map((badge) => (
-              <div key={badge.id} title={badge.description} className="flex items-center gap-1.5 rounded-full border border-gray-100 bg-white px-3 py-1.5 text-xs shadow-sm">
-                <span>{badge.icon}</span>
-                <span className="font-medium text-gray-700">{badge.label}</span>
-              </div>
-            ))}
-          </div>
+      <div className="mt-8">
+        <h2 className="font-display text-lg font-bold text-bg-dark">
+          Badges ({earnedBadges.length}/{BADGE_DEFINITIONS.length})
+        </h2>
+        <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
+          {allBadges.map((badge) => (
+            <div
+              key={badge.id}
+              className={`rounded-lg border border-border bg-card p-4 text-center transition-all ${
+                badge.earned ? 'hover:-translate-y-0.5 hover:shadow-md' : 'opacity-40'
+              }`}
+            >
+              <div className="text-3xl">{badge.earned ? badge.icon : '🔒'}</div>
+              <div className="mt-2 font-display text-xs font-semibold">{badge.label}</div>
+              <div className="mt-0.5 text-[10px] text-text-muted">{badge.description}</div>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* Reviews */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">My reviews</h2>
+        <h2 className="font-display text-lg font-bold text-bg-dark">My Reviews</h2>
         {loading ? (
           <div className="mt-6 flex justify-center"><LoadingSpinner /></div>
         ) : reviews.length === 0 ? (
@@ -115,13 +148,19 @@ export default function MyProfilePage() {
             icon="📝"
             title="No reviews yet"
             description="Write your first review to get started."
-            ctaLabel="Browse dishes"
-            onCta={() => router.push('/browse')}
+            ctaLabel="Explore dishes"
+            ctaHref="/explore"
           />
         ) : (
           <div className="mt-4 space-y-4">
             {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} currentUserId={user.id} />
+              <ReviewCard
+                key={review.id}
+                review={review}
+                currentUserId={user.id}
+                onEdit={() => handleEdit(review)}
+                onDelete={() => handleDelete(review)}
+              />
             ))}
           </div>
         )}

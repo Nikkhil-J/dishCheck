@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DishCheck — Landing Page Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       ============================================ */
+    :root {
+      --color-primary: #E23744;
+      --color-primary-dark: #C62D39;
+      --color-primary-light: #FF5A65;
+      --color-secondary: #FF6B35;
+      --color-accent: #FFB800;
+      --color-accent-light: #FFF0C2;
+      --color-success: #48C479;
+      --color-success-light: #E8F9EF;
+
+      --color-bg: #FFFFFF;
+      --color-bg-warm: #FFF8F0;
+      --color-bg-cream: #FFFAF5;
+      --color-bg-dark: #1C1C2B;
+      --color-bg-card: #FFFFFF;
+
+      --color-text: #2D2D3A;
+      --color-text-secondary: #6B7280;
+      --color-text-muted: #9CA3AF;
+      --color-text-on-dark: #FFFFFF;
+      --color-text-on-primary: #FFFFFF;
+
+      --color-border: #F0F0F0;
+      --color-border-hover: #E0E0E0;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+      --shadow-xl: 0 20px 50px rgba(0,0,0,0.12);
+      --shadow-glow: 0 4px 20px rgba(226,55,68,0.25);
+
+      --font-display: 'Fredoka', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    button { border: none; cursor: pointer; font-family: inherit; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ============================================
+       SCROLL ANIMATIONS
+       ============================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.6s var(--ease-smooth), transform 0.6s var(--ease-bounce);
+    }
+    .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+    /* ============================================
+       NAVBAR
+       ============================================ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+    .navbar.scrolled { box-shadow: var(--shadow-md); background: rgba(255,255,255,0.95); }
+    .navbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px; gap: 20px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-display); font-weight: 700; font-size: 24px;
+      color: var(--color-primary); flex-shrink: 0;
+    }
+    .nav-logo svg { width: 34px; height: 34px; }
+    .nav-search {
+      flex: 1; max-width: 480px; position: relative; display: none;
+    }
+    @media (min-width: 768px) { .nav-search { display: block; } }
+    .nav-search input {
+      width: 100%; height: 42px;
+      border: 2px solid var(--color-border); border-radius: var(--radius-pill);
+      padding: 0 16px 0 44px; font-size: 14px; font-family: var(--font-body);
+      background: var(--color-bg-cream); transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .nav-search input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(226,55,68,0.08);
+    }
+    .nav-search input::placeholder { color: var(--color-text-muted); }
+    .nav-search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--color-text-muted);
+    }
+    .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .nav-city {
+      display: none; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: var(--radius-pill);
+      background: var(--color-bg-cream); font-size: 14px; font-weight: 500;
+      color: var(--color-text); cursor: pointer; border: 1px solid var(--color-border);
+      transition: border-color 0.2s;
+    }
+    .nav-city:hover { border-color: var(--color-primary); }
+    @media (min-width: 768px) { .nav-city { display: flex; } }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-weight: 600; font-size: 14px; border-radius: var(--radius-pill);
+      padding: 10px 24px; transition: all 0.25s var(--ease-smooth); white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--color-primary); color: var(--color-text-on-primary);
+    }
+    .btn-primary:hover {
+      background: var(--color-primary-dark); transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-outline {
+      background: transparent; color: var(--color-text);
+      border: 2px solid var(--color-border);
+    }
+    .btn-outline:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .btn-ghost {
+      background: transparent; color: var(--color-text-secondary); padding: 8px 16px;
+    }
+    .btn-ghost:hover { color: var(--color-primary); }
+    .btn-lg { padding: 14px 32px; font-size: 16px; }
+    .btn-white { background: white; color: var(--color-bg-dark); font-weight: 600; }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: var(--shadow-xl); }
+    .btn-outline-white {
+      background: transparent; color: white; border: 2px solid rgba(255,255,255,0.3);
+    }
+    .btn-outline-white:hover { border-color: white; background: rgba(255,255,255,0.08); }
+
+    /* ============================================
+       HERO
+       ============================================ */
+    .hero {
+      padding: 130px 0 70px;
+      background: linear-gradient(180deg, var(--color-bg-cream) 0%, var(--color-bg) 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(226,55,68,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -150px; left: -150px;
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(255,184,0,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center;
+    }
+    @media (min-width: 1024px) { .hero-inner { grid-template-columns: 1fr 1fr; } }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px 6px 10px; background: var(--color-accent-light);
+      border-radius: var(--radius-pill); font-size: 13px; font-weight: 600;
+      color: #92660A; margin-bottom: 24px;
+      animation: fadeInDown 0.6s var(--ease-smooth) both;
+    }
+    .hero-badge-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--color-accent); animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.4); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 58px); font-weight: 700;
+      line-height: 1.12; color: var(--color-bg-dark); margin-bottom: 20px;
+      animation: fadeInUp 0.7s 0.15s var(--ease-smooth) both;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero h1 .city-name { position: relative; display: inline-block; }
+    .hero h1 .city-name::after {
+      content: ''; position: absolute; bottom: 2px; left: 0; right: 0;
+      height: 10px; background: var(--color-accent); opacity: 0.3;
+      border-radius: 5px; z-index: -1;
+    }
+    .hero-subtitle {
+      font-size: 18px; color: var(--color-text-secondary); margin-bottom: 32px;
+      max-width: 480px; animation: fadeInUp 0.7s 0.3s var(--ease-smooth) both;
+    }
+    .hero-search {
+      display: flex; align-items: center; background: var(--color-bg-card);
+      border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: 8px;
+      max-width: 520px; animation: fadeInUp 0.7s 0.45s var(--ease-smooth) both;
+      border: 2px solid var(--color-border); transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .hero-search:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-lg), 0 0 0 4px rgba(226,55,68,0.06);
+    }
+    .hero-search input {
+      flex: 1; border: none; outline: none; padding: 12px 16px;
+      font-size: 16px; font-family: var(--font-body); background: transparent;
+    }
+    .hero-search input::placeholder { color: var(--color-text-muted); }
+    .hero-search .btn { flex-shrink: 0; }
+
+    .hero-tags {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px;
+      animation: fadeInUp 0.7s 0.6s var(--ease-smooth) both;
+    }
+    .hero-tag {
+      padding: 7px 16px; border-radius: var(--radius-pill); font-size: 13px;
+      font-weight: 500; background: var(--color-bg); border: 1px solid var(--color-border);
+      color: var(--color-text-secondary); transition: all 0.2s; cursor: pointer;
+    }
+    .hero-tag:hover {
+      border-color: var(--color-primary); color: var(--color-primary);
+      background: rgba(226,55,68,0.03); transform: translateY(-1px);
+    }
+
+    /* Hero visual side */
+    .hero-visual { position: relative; display: none; }
+    @media (min-width: 1024px) { .hero-visual { display: block; } }
+    .hero-photo-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      animation: fadeIn 0.9s 0.4s var(--ease-smooth) both;
+    }
+    .hero-photo {
+      border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 1;
+      position: relative; transition: transform 0.3s var(--ease-smooth);
+    }
+    .hero-photo:hover { transform: scale(1.03); }
+    .hero-photo:nth-child(1) { background: linear-gradient(135deg, #fee2e2, #fecaca); }
+    .hero-photo:nth-child(2) { background: linear-gradient(135deg, #fef3c7, #fde68a); margin-top: 32px; }
+    .hero-photo:nth-child(3) { background: linear-gradient(135deg, #d1fae5, #a7f3d0); margin-top: -32px; }
+    .hero-photo:nth-child(4) { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+    .hero-photo-label {
+      position: absolute; bottom: 12px; left: 12px;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(10px);
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600;
+    }
+    .hero-floating-card {
+      position: absolute; background: var(--color-bg-card);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-lg);
+      padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+      animation: float 4s ease-in-out infinite; z-index: 2;
+    }
+    .hero-floating-card.card-1 { top: 20px; right: -16px; }
+    .hero-floating-card.card-2 { bottom: 50px; left: -16px; animation-delay: 2s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .floating-stars { display: flex; gap: 2px; color: var(--color-accent); font-size: 14px; }
+    .floating-text { font-size: 13px; font-weight: 600; }
+    .floating-sub { font-size: 11px; color: var(--color-text-muted); }
+
+    /* ============================================
+       STATS BAR
+       ============================================ */
+    .stats-bar {
+      padding: 48px 0; border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 24px; text-align: center;
+    }
+    @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-number {
+      font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; line-height: 1.2;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-label {
+      font-size: 14px; color: var(--color-text-secondary); margin-top: 4px; font-weight: 500;
+    }
+
+    /* ============================================
+       SECTION HEADERS
+       ============================================ */
+    .section-header { text-align: center; margin-bottom: 48px; }
+    .section-header.left-aligned { text-align: left; }
+    .section-label {
+      display: inline-block; font-size: 13px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-primary); margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 42px);
+      font-weight: 700; color: var(--color-bg-dark); line-height: 1.2; margin-bottom: 12px;
+    }
+    .section-subtitle {
+      font-size: 16px; color: var(--color-text-secondary);
+      max-width: 560px; margin: 0 auto; line-height: 1.6;
+    }
+    .section-header.left-aligned .section-subtitle { margin: 0; }
+
+    /* ============================================
+       TRENDING DISHES (CAROUSEL)
+       ============================================ */
+    .trending { padding: 80px 0; background: var(--color-bg); }
+    .section-top-row {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 36px; gap: 16px;
+    }
+    .trending-scroll {
+      display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .trending-scroll::-webkit-scrollbar { display: none; }
+
+    .dish-card {
+      flex: 0 0 280px; scroll-snap-align: start;
+      background: var(--color-bg-card); border-radius: var(--radius-lg);
+      overflow: hidden; border: 1px solid var(--color-border);
+      transition: all 0.3s var(--ease-smooth); cursor: pointer;
+    }
+    .dish-card:hover {
+      transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent;
+    }
+    .dish-card-image {
+      height: 180px; position: relative; overflow: hidden;
+    }
+    .dish-card-image::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.08), transparent 50%);
+    }
+    .dish-card-rating {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--color-success); color: white;
+      padding: 4px 10px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; gap: 4px; z-index: 1;
+    }
+    .dish-card-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(10px);
+      padding: 4px 12px; border-radius: var(--radius-pill);
+      font-size: 11px; font-weight: 600; color: var(--color-primary); z-index: 1;
+    }
+    .dish-card-body { padding: 16px; }
+    .dish-card-name {
+      font-family: var(--font-display); font-weight: 600; font-size: 17px;
+      margin-bottom: 4px; line-height: 1.3;
+    }
+    .dish-card-restaurant { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 12px; }
+    .dish-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .dish-card-tag {
+      padding: 3px 10px; border-radius: var(--radius-pill); font-size: 11px;
+      font-weight: 500; background: var(--color-bg-cream); color: var(--color-text-secondary);
+    }
+    .dish-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border);
+    }
+    .dish-card-reviews { font-size: 12px; color: var(--color-text-muted); }
+    .dish-card-price { font-weight: 600; font-size: 15px; color: var(--color-text); }
+
+    .see-all-link {
+      font-size: 14px; font-weight: 600; color: var(--color-primary);
+      display: inline-flex; align-items: center; gap: 4px;
+      transition: gap 0.2s; flex-shrink: 0;
+    }
+    .see-all-link:hover { gap: 8px; }
+
+    /* ============================================
+       CUISINE GRID
+       ============================================ */
+    .cuisines { padding: 80px 0; background: var(--color-bg-warm); }
+    .cuisine-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+    }
+    @media (min-width: 640px) { .cuisine-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1024px) { .cuisine-grid { grid-template-columns: repeat(4, 1fr); } }
+    .cuisine-card {
+      position: relative; padding: 28px 20px; border-radius: var(--radius-lg);
+      overflow: hidden; cursor: pointer; transition: all 0.3s var(--ease-smooth);
+      text-align: center; background: var(--color-bg-card); border: 1px solid var(--color-border);
+    }
+    .cuisine-card:hover {
+      transform: translateY(-4px) scale(1.02); box-shadow: var(--shadow-lg);
+      border-color: transparent;
+    }
+    .cuisine-icon {
+      font-size: 42px; margin-bottom: 12px; display: block;
+      transition: transform 0.3s var(--ease-bounce);
+    }
+    .cuisine-card:hover .cuisine-icon { transform: scale(1.2) rotate(-5deg); }
+    .cuisine-name {
+      font-family: var(--font-display); font-weight: 600; font-size: 16px;
+      color: var(--color-text);
+    }
+    .cuisine-count { font-size: 12px; color: var(--color-text-muted); margin-top: 4px; }
+
+    /* ============================================
+       HOW IT WORKS
+       ============================================ */
+    .how-it-works { padding: 80px 0; background: var(--color-bg); }
+    .steps-grid {
+      display: grid; grid-template-columns: 1fr; gap: 24px;
+    }
+    @media (min-width: 768px) { .steps-grid { grid-template-columns: repeat(3, 1fr); } }
+    .step-card {
+      text-align: center; padding: 40px 28px; border-radius: var(--radius-xl);
+      background: var(--color-bg-card); border: 1px solid var(--color-border);
+      transition: all 0.3s var(--ease-smooth); position: relative;
+    }
+    .step-card:hover {
+      border-color: transparent; box-shadow: var(--shadow-lg); transform: translateY(-4px);
+    }
+    .step-number {
+      position: absolute; top: 20px; left: 20px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--color-bg-warm); color: var(--color-primary);
+      font-family: var(--font-display); font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-icon {
+      width: 76px; height: 76px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 34px;
+      transition: transform 0.3s var(--ease-bounce);
+    }
+    .step-card:hover .step-icon { transform: scale(1.1); }
+    .step-card:nth-child(1) .step-icon { background: linear-gradient(135deg, #FEE2E2, #FECDD3); }
+    .step-card:nth-child(2) .step-icon { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+    .step-card:nth-child(3) .step-icon { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+    .step-title {
+      font-family: var(--font-display); font-weight: 600; font-size: 20px;
+      margin-bottom: 10px; color: var(--color-bg-dark);
+    }
+    .step-desc { font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; }
+    .step-connector {
+      display: none; position: absolute; top: 50%; right: -36px;
+      color: var(--color-text-muted); font-size: 24px;
+    }
+    @media (min-width: 768px) {
+      .step-card:not(:last-child) .step-connector { display: block; }
+    }
+
+    /* ============================================
+       FEATURED RESTAURANTS
+       ============================================ */
+    .restaurants { padding: 80px 0; background: var(--color-bg-warm); }
+    .restaurant-grid {
+      display: grid; grid-template-columns: 1fr; gap: 20px;
+    }
+    @media (min-width: 640px) { .restaurant-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .restaurant-grid { grid-template-columns: repeat(3, 1fr); } }
+    .restaurant-card {
+      background: var(--color-bg-card); border-radius: var(--radius-lg);
+      overflow: hidden; border: 1px solid var(--color-border);
+      transition: all 0.3s var(--ease-smooth); cursor: pointer;
+    }
+    .restaurant-card:hover {
+      transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: transparent;
+    }
+    .restaurant-card-image { height: 160px; position: relative; }
+    .restaurant-card-body { padding: 16px; }
+    .restaurant-card-name {
+      font-family: var(--font-display); font-weight: 600; font-size: 17px; margin-bottom: 4px;
+    }
+    .restaurant-card-meta {
+      font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px;
+    }
+    .restaurant-card-cuisines { display: flex; flex-wrap: wrap; gap: 6px; }
+    .restaurant-card-cuisine {
+      padding: 3px 10px; border-radius: var(--radius-pill); font-size: 11px;
+      font-weight: 500; background: var(--color-bg-cream); color: var(--color-text-secondary);
+    }
+
+    /* ============================================
+       TESTIMONIALS
+       ============================================ */
+    .testimonials { padding: 80px 0; background: var(--color-bg); }
+    .testimonial-grid {
+      display: grid; grid-template-columns: 1fr; gap: 20px;
+    }
+    @media (min-width: 768px) { .testimonial-grid { grid-template-columns: repeat(3, 1fr); } }
+    .testimonial-card {
+      padding: 28px; border-radius: var(--radius-lg);
+      background: var(--color-bg-card); border: 1px solid var(--color-border);
+      transition: all 0.3s var(--ease-smooth);
+    }
+    .testimonial-card:hover {
+      box-shadow: var(--shadow-md); border-color: transparent;
+    }
+    .testimonial-stars {
+      color: var(--color-accent); font-size: 16px; margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    .testimonial-text {
+      font-size: 15px; line-height: 1.7; color: var(--color-text);
+      margin-bottom: 20px; font-style: italic;
+    }
+    .testimonial-author {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .testimonial-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; color: white;
+    }
+    .testimonial-name { font-weight: 600; font-size: 14px; }
+    .testimonial-meta { font-size: 12px; color: var(--color-text-muted); }
+
+    /* ============================================
+       CTA SECTION
+       ============================================ */
+    .cta-section {
+      padding: 100px 0; background: var(--color-bg-dark);
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: ''; position: absolute; top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(226,55,68,0.15) 0%, transparent 70%);
+    }
+    .cta-section::after {
+      content: ''; position: absolute; bottom: -80px; left: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(255,184,0,0.1) 0%, transparent 70%);
+    }
+    .cta-inner { text-align: center; position: relative; z-index: 1; }
+    .cta-inner .section-title { color: var(--color-text-on-dark); }
+    .cta-inner .section-subtitle { color: rgba(255,255,255,0.6); }
+    .cta-buttons {
+      display: flex; gap: 16px; justify-content: center; margin-top: 36px; flex-wrap: wrap;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    .footer {
+      background: var(--color-bg-dark);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 48px 0 32px;
+    }
+    .footer-inner {
+      display: grid; grid-template-columns: 1fr; gap: 32px;
+    }
+    @media (min-width: 768px) {
+      .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; }
+    }
+    .footer-tagline {
+      font-size: 14px; color: rgba(255,255,255,0.45);
+      max-width: 280px; line-height: 1.7; margin-top: 12px;
+    }
+    .footer-col-title {
+      font-family: var(--font-display); font-weight: 600; font-size: 15px;
+      color: white; margin-bottom: 16px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a {
+      font-size: 14px; color: rgba(255,255,255,0.45); transition: color 0.2s;
+    }
+    .footer-links a:hover { color: white; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin-top: 40px; padding-top: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copyright { font-size: 13px; color: rgba(255,255,255,0.3); }
+    .footer-socials { display: flex; gap: 10px; }
+    .footer-social {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.45); transition: all 0.2s; font-size: 14px;
+    }
+    .footer-social:hover { background: var(--color-primary); color: white; }
+
+    /* ============================================
+       MOBILE BOTTOM NAV
+       ============================================ */
+    .mobile-nav {
+      display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--color-border); z-index: 100;
+      padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+    }
+    @media (min-width: 768px) { .mobile-nav { display: none; } }
+    .mobile-nav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 6px 0; font-size: 10px; font-weight: 500;
+      color: var(--color-text-muted); background: none; transition: color 0.2s;
+    }
+    .mobile-nav-item.active { color: var(--color-primary); }
+    .mobile-nav-item svg { width: 22px; height: 22px; }
+    .review-btn-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--color-primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -22px; box-shadow: var(--shadow-glow);
+      transition: transform 0.2s var(--ease-bounce);
+    }
+    .review-btn-icon:hover { transform: scale(1.08); }
+
+    /* ============================================
+       MOBILE PADDING (for bottom nav)
+       ============================================ */
+    @media (max-width: 767px) {
+      .footer { padding-bottom: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="container navbar-inner">
+      <a class="nav-logo" href="#">
+        <svg viewBox="0 0 34 34" fill="none">
+          <rect width="34" height="34" rx="10" fill="#E23744"/>
+          <path d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z" fill="white" opacity="0.9"/>
+          <path d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z" fill="white" opacity="0.7"/>
+          <circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9"/>
+        </svg>
+        DishCheck
+      </a>
+
+      <div class="nav-search">
+        <svg class="nav-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="search" placeholder="Search for a dish, restaurant, or cuisine...">
+      </div>
+
+      <div class="nav-right">
+        <button class="nav-city">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Bengaluru
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <a href="#" class="btn btn-ghost">Log in</a>
+        <a href="#" class="btn btn-primary">Sign up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Now live in Bengaluru &amp; Gurugram
+        </div>
+        <h1>
+          Find the <span class="highlight">Best Dishes</span><br>
+          in <span class="city-name">Bengaluru</span>
+        </h1>
+        <p class="hero-subtitle">
+          Real reviews for real dishes. Know exactly what to order before you get there.
+        </p>
+        <div class="hero-search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:12px;flex-shrink:0">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input type="text" placeholder='Try "Butter Chicken" or "Dosa"...'>
+          <button class="btn btn-primary">Search</button>
+        </div>
+        <div class="hero-tags">
+          <span class="hero-tag">🍛 Biryani</span>
+          <span class="hero-tag">🍕 Pizza</span>
+          <span class="hero-tag">🥘 Butter Chicken</span>
+          <span class="hero-tag">🍜 Ramen</span>
+          <span class="hero-tag">🫓 Dosa</span>
+          <span class="hero-tag">🍰 Desserts</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-photo-grid">
+          <div class="hero-photo">
+            <div class="hero-photo-label">🔥 Trending</div>
+          </div>
+          <div class="hero-photo">
+            <div class="hero-photo-label">⭐ 4.8 Rating</div>
+          </div>
+          <div class="hero-photo">
+            <div class="hero-photo-label">📸 12 photos</div>
+          </div>
+          <div class="hero-photo">
+            <div class="hero-photo-label">❤️ 45 saves</div>
+          </div>
+        </div>
+        <div class="hero-floating-card card-1">
+          <div class="floating-stars">★★★★★</div>
+          <div>
+            <div class="floating-text">Hyderabadi Biryani</div>
+            <div class="floating-sub">Paradise • Indiranagar</div>
+          </div>
+        </div>
+        <div class="hero-floating-card card-2">
+          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--color-success),#34D399);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px">4.6</div>
+          <div>
+            <div class="floating-text">Masala Dosa</div>
+            <div class="floating-sub">MTR • Lalbagh</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item reveal">
+          <div class="stat-number">2,500+</div>
+          <div class="stat-label">Dish Reviews</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-1">
+          <div class="stat-number">850+</div>
+          <div class="stat-label">Unique Dishes</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-2">
+          <div class="stat-number">200+</div>
+          <div class="stat-label">Restaurants</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-3">
+          <div class="stat-number">5,000+</div>
+          <div class="stat-label">Food Lovers</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRENDING DISHES ===== -->
+  <section class="trending">
+    <div class="container">
+      <div class="section-top-row">
+        <div class="section-header left-aligned" style="margin-bottom:0">
+          <div class="section-label">Trending Now 🔥</div>
+          <h2 class="section-title">Dishes Everyone's Talking About</h2>
+        </div>
+        <a href="#" class="see-all-link">
+          See all <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </div>
+      <div class="trending-scroll">
+        <div class="dish-card reveal">
+          <div class="dish-card-image" style="background:linear-gradient(135deg,#FECDD3,#FDA4AF)">
+            <div class="dish-card-rating">★ 4.8</div>
+            <div class="dish-card-badge">🔥 #1 Trending</div>
+          </div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Hyderabadi Dum Biryani</div>
+            <div class="dish-card-restaurant">Paradise Biryani • Indiranagar</div>
+            <div class="dish-card-tags">
+              <span class="dish-card-tag">Spicy</span>
+              <span class="dish-card-tag">Generous Portions</span>
+              <span class="dish-card-tag">Must Try</span>
+            </div>
+            <div class="dish-card-footer">
+              <span class="dish-card-reviews">128 reviews</span>
+              <span class="dish-card-price">₹350</span>
+            </div>
+          </div>
+        </div>
+        <div class="dish-card reveal reveal-delay-1">
+          <div class="dish-card-image" style="background:linear-gradient(135deg,#FDE68A,#FCD34D)">
+            <div class="dish-card-rating">★ 4.7</div>
+            <div class="dish-card-badge">⭐ Staff Pick</div>
+          </div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Ghee Roast Masala Dosa</div>
+            <div class="dish-card-restaurant">MTR 1924 • Lalbagh Road</div>
+            <div class="dish-card-tags">
+              <span class="dish-card-tag">Crispy</span>
+              <span class="dish-card-tag">Authentic</span>
+              <span class="dish-card-tag">Value for Money</span>
+            </div>
+            <div class="dish-card-footer">
+              <span class="dish-card-reviews">96 reviews</span>
+              <span class="dish-card-price">₹180</span>
+            </div>
+          </div>
+        </div>
+        <div class="dish-card reveal reveal-delay-2">
+          <div class="dish-card-image" style="background:linear-gradient(135deg,#A7F3D0,#6EE7B7)">
+            <div class="dish-card-rating">★ 4.6</div>
+          </div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Truffle Mushroom Pizza</div>
+            <div class="dish-card-restaurant">Toit Brewpub • Indiranagar</div>
+            <div class="dish-card-tags">
+              <span class="dish-card-tag">Cheesy</span>
+              <span class="dish-card-tag">Wood-Fired</span>
+            </div>
+            <div class="dish-card-footer">
+              <span class="dish-card-reviews">74 reviews</span>
+              <span class="dish-card-price">₹550</span>
+            </div>
+          </div>
+        </div>
+        <div class="dish-card reveal reveal-delay-3">
+          <div class="dish-card-image" style="background:linear-gradient(135deg,#DDD6FE,#C4B5FD)">
+            <div class="dish-card-rating">★ 4.5</div>
+          </div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Death by Chocolate</div>
+            <div class="dish-card-restaurant">Corner House • Jayanagar</div>
+            <div class="dish-card-tags">
+              <span class="dish-card-tag">Dessert</span>
+              <span class="dish-card-tag">Iconic</span>
+              <span class="dish-card-tag">Rich</span>
+            </div>
+            <div class="dish-card-footer">
+              <span class="dish-card-reviews">203 reviews</span>
+              <span class="dish-card-price">₹220</span>
+            </div>
+          </div>
+        </div>
+        <div class="dish-card reveal reveal-delay-4">
+          <div class="dish-card-image" style="background:linear-gradient(135deg,#FBCFE8,#F9A8D4)">
+            <div class="dish-card-rating">★ 4.9</div>
+            <div class="dish-card-badge">👑 Top Rated</div>
+          </div>
+          <div class="dish-card-body">
+            <div class="dish-card-name">Tonkotsu Ramen</div>
+            <div class="dish-card-restaurant">Ichiraku • Koramangala</div>
+            <div class="dish-card-tags">
+              <span class="dish-card-tag">Umami</span>
+              <span class="dish-card-tag">Hearty</span>
+            </div>
+            <div class="dish-card-footer">
+              <span class="dish-card-reviews">61 reviews</span>
+              <span class="dish-card-price">₹480</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CUISINES ===== -->
+  <section class="cuisines">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">Explore by Cuisine</div>
+        <h2 class="section-title">What Are You Craving?</h2>
+        <p class="section-subtitle">From street-side chaat to fine-dining Italian — find the best of every cuisine in your city.</p>
+      </div>
+      <div class="cuisine-grid">
+        <div class="cuisine-card reveal"><span class="cuisine-icon">🍛</span><div class="cuisine-name">North Indian</div><div class="cuisine-count">240 dishes</div></div>
+        <div class="cuisine-card reveal reveal-delay-1"><span class="cuisine-icon">🫓</span><div class="cuisine-name">South Indian</div><div class="cuisine-count">185 dishes</div></div>
+        <div class="cuisine-card reveal reveal-delay-2"><span class="cuisine-icon">🍕</span><div class="cuisine-name">Italian</div><div class="cuisine-count">92 dishes</div></div>
+        <div class="cuisine-card reveal reveal-delay-3"><span class="cuisine-icon">🍜</span><div class="cuisine-name">Chinese</div><div class="cuisine-count">134 dishes</div></div>
+        <div class="cuisine-card reveal"><span class="cuisine-icon">🍣</span><div class="cuisine-name">Japanese</div><div class="cuisine-count">56 dishes</div></div>
+        <div class="cuisine-card reveal reveal-delay-1"><span class="cuisine-icon">🌮</span><div class="cuisine-name">Mexican</div><div class="cuisine-count">38 dishes</div></div>
+        <div class="cuisine-card reveal reveal-delay-2"><span class="cuisine-icon">🥘</span><div class="cuisine-name">Mughlai</div><div class="cuisine-count">78 dishes</div></div>
+        <div class="cuisine-card reveal reveal-delay-3"><span class="cuisine-icon">🍰</span><div class="cuisine-name">Desserts</div><div class="cuisine-count">115 dishes</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="how-it-works">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">Three Steps to Your Next Great Meal</h2>
+        <p class="section-subtitle">DishCheck makes it ridiculously easy to find dishes worth eating.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <div class="step-number">1</div>
+          <div class="step-icon">🔍</div>
+          <div class="step-title">Search a Dish</div>
+          <div class="step-desc">Look up any dish by name, cuisine, or restaurant. We've got detailed reviews for hundreds of dishes near you.</div>
+          <div class="step-connector">→</div>
+        </div>
+        <div class="step-card reveal reveal-delay-1">
+          <div class="step-number">2</div>
+          <div class="step-icon">⭐</div>
+          <div class="step-title">Read Real Reviews</div>
+          <div class="step-desc">See taste, portion, and value sub-ratings from real diners. Photos, tags, and detailed feedback — not just a number.</div>
+          <div class="step-connector">→</div>
+        </div>
+        <div class="step-card reveal reveal-delay-2">
+          <div class="step-number">3</div>
+          <div class="step-icon">✍️</div>
+          <div class="step-title">Share Your Take</div>
+          <div class="step-desc">Tried the dish? Rate it, tag it, snap a photo. Earn badges and level up as you help others eat better.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RESTAURANTS ===== -->
+  <section class="restaurants">
+    <div class="container">
+      <div class="section-top-row">
+        <div class="section-header left-aligned" style="margin-bottom:0">
+          <div class="section-label">Featured Spots</div>
+          <h2 class="section-title">Restaurants Worth Exploring</h2>
+        </div>
+        <a href="#" class="see-all-link">
+          See all <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </div>
+      <div class="restaurant-grid">
+        <div class="restaurant-card reveal">
+          <div class="restaurant-card-image" style="background:linear-gradient(135deg,#FECDD3,#FCA5A5)"></div>
+          <div class="restaurant-card-body">
+            <div class="restaurant-card-name">Paradise Biryani</div>
+            <div class="restaurant-card-meta">📍 Indiranagar, Bengaluru • 4.6 ★</div>
+            <div class="restaurant-card-cuisines">
+              <span class="restaurant-card-cuisine">Biryani</span>
+              <span class="restaurant-card-cuisine">Mughlai</span>
+              <span class="restaurant-card-cuisine">North Indian</span>
+            </div>
+          </div>
+        </div>
+        <div class="restaurant-card reveal reveal-delay-1">
+          <div class="restaurant-card-image" style="background:linear-gradient(135deg,#FDE68A,#FBBF24)"></div>
+          <div class="restaurant-card-body">
+            <div class="restaurant-card-name">Toit Brewpub</div>
+            <div class="restaurant-card-meta">📍 Indiranagar, Bengaluru • 4.5 ★</div>
+            <div class="restaurant-card-cuisines">
+              <span class="restaurant-card-cuisine">Continental</span>
+              <span class="restaurant-card-cuisine">Italian</span>
+              <span class="restaurant-card-cuisine">Craft Beer</span>
+            </div>
+          </div>
+        </div>
+        <div class="restaurant-card reveal reveal-delay-2">
+          <div class="restaurant-card-image" style="background:linear-gradient(135deg,#C4B5FD,#A78BFA)"></div>
+          <div class="restaurant-card-body">
+            <div class="restaurant-card-name">MTR 1924</div>
+            <div class="restaurant-card-meta">📍 Lalbagh Road, Bengaluru • 4.7 ★</div>
+            <div class="restaurant-card-cuisines">
+              <span class="restaurant-card-cuisine">South Indian</span>
+              <span class="restaurant-card-cuisine">Traditional</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section class="testimonials">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">What People Say</div>
+        <h2 class="section-title">Loved by Food Enthusiasts</h2>
+      </div>
+      <div class="testimonial-grid">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-text">"Finally an app that reviews dishes, not just restaurants. I knew exactly which biryani to order before I even walked in!"</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-secondary))">A</div>
+            <div>
+              <div class="testimonial-name">Aanya Sharma</div>
+              <div class="testimonial-meta">42 reviews • Level 3</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-text">"The sub-ratings for taste, portion and value are genius. No more paying ₹500 for a tiny plate of pasta."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6366F1)">R</div>
+            <div>
+              <div class="testimonial-name">Rahul Menon</div>
+              <div class="testimonial-meta">28 reviews • Level 2</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-text">"Love the badge system! It's addictive. I've reviewed 50+ dishes and my friends actually follow my recommendations now."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--color-success),#34D399)">P</div>
+            <div>
+              <div class="testimonial-name">Priya Patel</div>
+              <div class="testimonial-meta">53 reviews • Level 4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta-section">
+    <div class="container cta-inner">
+      <div class="section-header reveal" style="margin-bottom:0">
+        <div class="section-label" style="color:var(--color-accent)">Join the Community</div>
+        <h2 class="section-title">Stop Guessing.<br>Start Eating Better.</h2>
+        <p class="section-subtitle">Join thousands of food lovers who use DishCheck to discover, review, and share the best dishes in their city.</p>
+      </div>
+      <div class="cta-buttons reveal reveal-delay-1">
+        <a href="#" class="btn btn-white btn-lg">Create Free Account</a>
+        <a href="#" class="btn btn-outline-white btn-lg">Explore Dishes</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <a class="nav-logo" href="#">
+            <svg viewBox="0 0 34 34" fill="none" width="28" height="28">
+              <rect width="34" height="34" rx="10" fill="#E23744"/>
+              <path d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z" fill="white" opacity="0.9"/>
+              <path d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z" fill="white" opacity="0.7"/>
+              <circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9"/>
+            </svg>
+            DishCheck
+          </a>
+          <p class="footer-tagline">Real reviews for real dishes. Know exactly what to order before you get there.</p>
+        </div>
+        <div>
+          <div class="footer-col-title">Discover</div>
+          <ul class="footer-links">
+            <li><a href="#">Browse Dishes</a></li>
+            <li><a href="#">Top Rated</a></li>
+            <li><a href="#">By Cuisine</a></li>
+            <li><a href="#">Restaurants</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Community</div>
+          <ul class="footer-links">
+            <li><a href="#">Write a Review</a></li>
+            <li><a href="#">Leaderboard</a></li>
+            <li><a href="#">Premium</a></li>
+            <li><a href="#">About Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Cities</div>
+          <ul class="footer-links">
+            <li><a href="#">Bengaluru</a></li>
+            <li><a href="#">Gurugram</a></li>
+            <li><a href="#" style="color:var(--color-accent)">+ More coming soon</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copyright">&copy; 2026 DishCheck. Made with ❤️ for food lovers.</div>
+        <div class="footer-socials">
+          <a href="#" class="footer-social">𝕏</a>
+          <a href="#" class="footer-social">in</a>
+          <a href="#" class="footer-social">ig</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== MOBILE BOTTOM NAV ===== -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </button>
+    <button class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      Explore
+    </button>
+    <button class="mobile-nav-item">
+      <div class="review-btn-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      Review
+    </button>
+    <button class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      Saved
+    </button>
+    <button class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </button>
+  </nav>
+
+  <script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-scale').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

@@ -1,68 +1,84 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Heart } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { useWishlistStore } from '@/lib/store/wishlistStore'
-import { getWishlist, removeFromWishlist } from '@/lib/firebase/wishlist'
+import { useWishlist } from '@/lib/hooks/useWishlist'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { Button } from '@/components/ui/button'
 import { formatRating } from '@/lib/utils/index'
 
 export default function WishlistPage() {
-  const { user } = useAuth()
-  const router = useRouter()
-  const { items, setAll, removeId } = useWishlistStore()
-
-  useEffect(() => {
-    if (!user) return
-    getWishlist(user.id).then(setAll)
-  }, [user]) // eslint-disable-line
+  const { user, authUser } = useAuth()
+  const queryClient = useQueryClient()
+  const { data: items = [], isLoading: loading } = useWishlist()
 
   async function handleRemove(dishId: string) {
-    if (!user) return
-    removeId(dishId)
-    await removeFromWishlist(user.id, dishId)
+    if (!user || !authUser) return
+    const token = await authUser.getIdToken()
+    const res = await fetch(
+      `/api/users/${encodeURIComponent(user.id)}/wishlist/${encodeURIComponent(dishId)}`,
+      { method: 'DELETE', headers: { authorization: `Bearer ${token}` } }
+    )
+    await queryClient.invalidateQueries({ queryKey: ['wishlist'] })
+    if (!res.ok) {
+      await queryClient.invalidateQueries({ queryKey: ['wishlist'] })
+    }
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="text-2xl font-bold text-gray-900">Wishlist</h1>
-      <p className="mt-1 text-sm text-gray-500">Dishes you want to try</p>
+    <div className="mx-auto max-w-[900px] px-6 py-8">
+      <div className="text-center">
+        <h1 className="font-display text-2xl font-bold text-bg-dark">Your Wishlist</h1>
+        <p className="mt-1 text-sm text-text-secondary">Dishes you want to try next</p>
+        {items.length > 0 && (
+          <p className="mt-2 text-xs text-text-muted">{items.length} dishes saved</p>
+        )}
+      </div>
 
-      {items.length === 0 ? (
+      {loading ? (
+        <div className="mt-10 flex justify-center"><LoadingSpinner /></div>
+      ) : items.length === 0 ? (
         <div className="mt-8">
           <EmptyState
-            icon="🔖"
-            title="Your wishlist is empty"
-            description="Save dishes you want to try and find them here."
-            ctaLabel="Browse dishes"
-            onCta={() => router.push('/browse')}
+            icon="💭"
+            title="No dishes saved yet"
+            description="Browse dishes and tap the heart icon to save them here for later."
+            ctaLabel="Explore Dishes"
+            ctaHref="/explore"
           />
         </div>
       ) : (
-        <div className="mt-6 space-y-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
-            <div key={item.dishId} className="flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-              {item.coverImage ? (
-                <Image src={item.coverImage} alt={item.dishName} width={64} height={64} className="h-16 w-16 rounded-lg object-cover" />
-              ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-gray-100 text-2xl">🍽️</div>
-              )}
-              <div className="flex-1 min-w-0">
-                <Link href={`/dish/${item.dishId}`} className="font-medium text-gray-900 hover:text-brand line-clamp-1">
+            <div key={item.dishId} className="group overflow-hidden rounded-lg border border-border bg-card transition-all hover:-translate-y-0.5 hover:border-transparent hover:shadow-md">
+              <div className="relative h-36 bg-bg-cream">
+                {item.coverImage ? (
+                  <Image src={item.coverImage} alt={item.dishName} fill className="object-cover" />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-4xl">🍽️</div>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleRemove(item.dishId)}
+                  className="absolute right-2.5 top-2.5 size-8 rounded-full bg-card/90 text-primary backdrop-blur-sm hover:bg-primary hover:text-white"
+                >
+                  <Heart className="h-3.5 w-3.5" fill="currentColor" />
+                </Button>
+              </div>
+              <div className="p-3.5">
+                <Link href={`/dish/${item.dishId}`} className="font-display font-semibold text-bg-dark line-clamp-1 hover:text-primary">
                   {item.dishName}
                 </Link>
-                <p className="text-xs text-gray-500">{item.restaurantName}</p>
-                <p className="text-xs text-brand font-medium">★ {formatRating(item.avgOverall)}</p>
+                <p className="mt-0.5 text-xs text-text-muted">{item.restaurantName}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs font-bold text-success">★ {formatRating(item.avgOverall)}</span>
+                </div>
               </div>
-              <button
-                onClick={() => handleRemove(item.dishId)}
-                className="text-xs text-gray-400 hover:text-red-500 shrink-0"
-              >
-                Remove
-              </button>
             </div>
           ))}
         </div>

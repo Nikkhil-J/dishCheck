@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils'
+
 type Size = 'sm' | 'md' | 'lg'
 
 interface LoadingSpinnerProps {
@@ -11,11 +13,11 @@ const sizeClasses: Record<Size, string> = {
   lg: 'h-12 w-12',
 }
 
-export function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) {
   return (
-    <div className={['flex items-center justify-center', className].join(' ')}>
+    <div className={cn('flex items-center justify-center', className)}>
       <svg
-        className={['animate-spin text-emerald-600', sizeClasses[size]].join(' ')}
+        className={cn('animate-spin text-primary', sizeClasses[size])}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

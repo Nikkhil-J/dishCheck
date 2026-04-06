@@ -1,21 +1,31 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Fredoka, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fredoka = Fredoka({
+  variable: "--font-display",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: 'DishCheck — Dish reviews for Bengaluru',
-  description: 'Find the best dishes in Bengaluru with honest reviews from real food lovers.',
+  title: "DishCheck — Discover the best dishes in your city",
+  description:
+    "Honest dish-level reviews from real food lovers. Find your next favourite dish — not just the restaurant.",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#1C1C2B" },
+  ],
 };
 
 export default function RootLayout({
@@ -26,7 +36,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      className={`${fredoka.variable} ${dmSans.variable} h-full`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

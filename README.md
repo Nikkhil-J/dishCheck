@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DishCheck
 
-## Getting Started
+Dish-level review platform for India. Users search for a specific dish at a specific restaurant and read or write reviews with photos, sub-ratings (taste, portion, value), and tags. Includes a DishPoints economy, premium tier, and restaurant owner dashboards.
 
-First, run the development server:
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript (strict mode) |
+| Database | Cloud Firestore |
+| Auth | Firebase Auth (email + Google) |
+| State | Zustand (client), TanStack Query (server cache) |
+| Styling | Tailwind CSS v4 |
+| Image uploads | Cloudinary |
+| Payments | Razorpay |
+| Error tracking | Sentry (optional) |
+| Deployment | Vercel |
+
+## Quick Start
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Copy env template and fill in values
+cp .env.local.example .env.local
+
+# 3. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All required and optional variables are documented in `.env.local.example`. At minimum you need:
 
-## Learn More
+| Variable | Required | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_FIREBASE_*` (6 vars) | Yes | Firebase client SDK config |
+| `FIREBASE_PROJECT_ID` | Yes (server) | Firebase Admin SDK |
+| `FIREBASE_CLIENT_EMAIL` | Yes (server) | Firebase Admin SDK |
+| `FIREBASE_PRIVATE_KEY` | Yes (server) | Firebase Admin SDK |
+| `NEXT_PUBLIC_CLOUDINARY_*` | No | Photo uploads |
+| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | No | Premium payments |
+| `SENTRY_DSN` | No | Error tracking |
+| `GOOGLE_PLACES_API_KEY` | No | Restaurant ingestion script |
 
-To learn more about Next.js, take a look at the following resources:
+If required variables are missing, the app throws a descriptive error at startup (see `src/lib/env.ts`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run start        # Start production server
+npm run lint         # ESLint
+npm run typecheck    # TypeScript type checking
+npm run test:unit    # Vitest unit tests
 
-## Deploy on Vercel
+npm run ingest       # Ingest restaurants from Google Places API
+npx tsx scripts/seed.ts           # Seed sample data
+npx tsx scripts/seed-cities.ts    # Seed city metadata
+npx tsx scripts/backfill-dish-denorm.ts  # Backfill denormalized dish fields
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Firestore Emulator
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For local development without touching production data:
+
+```bash
+# Install Firebase CLI if needed
+npm install -g firebase-tools
+
+# Start emulators
+firebase emulators:start --only firestore
+
+# Seed the emulator
+FIRESTORE_EMULATOR_HOST=localhost:8080 npx tsx scripts/seed.ts
+```
+
+## Project Structure
+
+```
+src/
+├── app/                        # Next.js App Router
+│   ├── (public)/               # Unauthenticated pages
+│   ├── (protected)/            # Authenticated pages
+│   ├── (auth)/                 # Login / signup / forgot-password
+│   ├── (admin)/                # Admin dashboard
+│   └── api/                    # API routes (all writes)
+├── components/
+│   ├── ui/                     # Reusable primitives
+│   ├── features/               # Feature components
+│   └── layouts/                # Shells, Navbar, Footer
+├── lib/
+│   ├── auth/                   # Token verification
+│   ├── constants/              # Tags, badges, cuisines
+│   ├── env.ts                  # Validated env vars (Zod)
+│   ├── firebase/               # Firestore CRUD (client SDK)
+│   ├── hooks/                  # React hooks (reads only)
+│   ├── monitoring/             # Sentry wrapper
+│   ├── repositories/           # Repository pattern
+│   ├── services/               # Business logic
+│   ├── store/                  # Zustand stores
+│   ├── types/                  # TypeScript types
+│   ├── utils/                  # Utility functions
+│   └── validation/             # Zod schemas
+└── __tests__/                  # Unit tests
+```
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full data flow, client/server boundary rules, and collection access matrix.
+
+## Deploy
+
+The app deploys to Vercel on push to `main`. The CI pipeline (`.github/workflows/ci.yml`) runs lint, typecheck, and unit tests before deploy.
+
+On deploy to main, Sentry source maps are uploaded for readable stack traces.
+
+## Key Documentation
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — System design, data flow, client/server boundary
+- [docs/RUNBOOK.md](./docs/RUNBOOK.md) — Operational procedures and incident response
+- [docs/REWARDS_SYSTEM.md](./docs/REWARDS_SYSTEM.md) — DishPoints ledger specification

@@ -2,124 +2,188 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
-  --color-brand: #1D9E75;
-  --color-brand-light: #E1F5EE;
-  --color-brand-dark: #0F6E56;
-  --color-accent-red: #E24B4A;
-  --color-surface: #F7F7F5;
+  /* ── Static colors (identical in light & dark) ── */
+  --color-primary: #E23744;
+  --color-primary-dark: #C62D39;
+  --color-secondary: #FF6B35;
+  --color-accent: #FFB800;
+  --color-brand: #E23744;
+  --color-brand-dark: #C62D39;
+
+  /* ── Dynamic colors (resolve at runtime via --dc-* custom properties) ── */
+  --color-primary-light: var(--dc-primary-light);
+  --color-accent-light: var(--dc-accent-light);
+  --color-success: var(--dc-success);
+  --color-surface: var(--dc-surface);
+  --color-bg-warm: var(--dc-bg-warm);
+  --color-bg-cream: var(--dc-bg-cream);
+  --color-bg-dark: var(--dc-bg-dark);
+  --color-brand-light: var(--dc-brand-light);
+  --color-text-primary: var(--dc-text-primary);
+  --color-text-secondary: var(--dc-text-secondary);
+  --color-text-muted: var(--dc-text-muted);
+  --color-border: var(--dc-border);
+
+  /* ── Aliases to shadcn semantic tokens (already runtime-dynamic) ── */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* ── Typography ── */
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+
+  /* ── Radii ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 4px 20px rgba(226, 55, 68, 0.25);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* ── shadcn semantic tokens ── */
+  --background: #ffffff;
+  --foreground: #2D2D3A;
+  --card: #ffffff;
+  --card-foreground: #2D2D3A;
+  --popover: #ffffff;
+  --popover-foreground: #2D2D3A;
+  --primary: #E23744;
+  --primary-foreground: #ffffff;
+  --secondary: #F7F7F8;
+  --secondary-foreground: #2D2D3A;
+  --muted: #F7F7F8;
+  --muted-foreground: #6B7280;
+  --accent: #FFF8F0;
+  --accent-foreground: #2D2D3A;
+  --destructive: #E24B4A;
+  --border: #F0F0F0;
+  --input: #F0F0F0;
+  --ring: #E23744;
+  --radius: 0.75rem;
+
+  /* ── Runtime theme tokens (light defaults) ── */
+  --dc-surface: #F7F7F8;
+  --dc-bg-warm: #FFF8F0;
+  --dc-bg-cream: #FFFAF5;
+  --dc-bg-dark: #1C1C2B;
+  --dc-text-primary: #2D2D3A;
+  --dc-text-secondary: #6B7280;
+  --dc-text-muted: #9CA3AF;
+  --dc-border: #F0F0F0;
+  --dc-primary-light: #FEE2E5;
+  --dc-accent-light: #FFF0C2;
+  --dc-success: #48C479;
+  --dc-brand-light: #FEE2E5;
+
+  /*
+   * CSS custom properties for var(--color-*) references in components.
+   * @theme inline does NOT register CSS custom properties, so arbitrary
+   * value usages like text-[var(--color-accent)] need these explicit defs.
+   * Dynamic tokens point to --dc-* so they switch with .dark automatically.
+   */
+  --color-primary: #E23744;
+  --color-primary-dark: #C62D39;
+  --color-primary-light: var(--dc-primary-light);
+  --color-secondary: #FF6B35;
+  --color-accent: #FFB800;
+  --color-accent-light: var(--dc-accent-light);
+  --color-success: var(--dc-success);
+  --color-surface: var(--dc-surface);
+  --color-bg-warm: var(--dc-bg-warm);
+  --color-bg-cream: var(--dc-bg-cream);
+  --color-bg-dark: var(--dc-bg-dark);
+  --color-text-primary: var(--dc-text-primary);
+  --color-text-secondary: var(--dc-text-secondary);
+  --color-text-muted: var(--dc-text-muted);
+  --color-border: var(--dc-border);
+  --color-brand: #E23744;
+  --color-brand-light: var(--dc-brand-light);
+  --color-brand-dark: #C62D39;
+  --color-destructive: var(--destructive);
+
+  /* ── Shimmer ── */
+  --shimmer-from: var(--dc-border);
+  --shimmer-via: var(--dc-surface);
+  --shimmer-to: var(--dc-border);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* ── shadcn semantic tokens (dark) ── */
+  --background: #1C1C2B;
+  --card: #252538;
+  --popover: #252538;
+  --foreground: #F2F2F7;
+  --card-foreground: #F2F2F7;
+  --popover-foreground: #F2F2F7;
+  --primary: #E23744;
+  --primary-foreground: #FFFFFF;
+  --border: #3A3A52;
+  --input: #3A3A52;
+  --destructive: #F87171;
+  --muted: #2D2D45;
+  --muted-foreground: #A8A8B8;
+  --secondary: #2D2D45;
+  --secondary-foreground: #F2F2F7;
+  --accent: #2D2D45;
+  --accent-foreground: #F2F2F7;
+  --ring: #E23744;
+
+  /* ── Sidebar ── */
+  --sidebar: #1C1C2B;
+  --sidebar-foreground: #F2F2F7;
+  --sidebar-border: #3A3A52;
+  --sidebar-accent: #2D2D45;
+  --sidebar-accent-foreground: #F2F2F7;
+  --sidebar-primary: #E23744;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-ring: #E23744;
+
+  /* ── Shimmer ── */
+  --shimmer-from: #2D2D45;
+  --shimmer-via: #383854;
+  --shimmer-to: #2D2D45;
+
+  /* ── Runtime theme tokens (dark overrides) ── */
+  --dc-surface: #2D2D45;
+  --dc-bg-warm: #1E1C2E;
+  --dc-bg-cream: #232333;
+  --dc-bg-dark: #F2F2F7;
+  --dc-text-primary: #F2F2F7;
+  --dc-text-secondary: #A8A8B8;
+  --dc-text-muted: #6B6B80;
+  --dc-border: #3A3A52;
+  --dc-primary-light: #3D1A1D;
+  --dc-accent-light: #2D2510;
+  --dc-success: #4ADE80;
+  --dc-brand-light: #3D1A1D;
+}
+
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
 }
 
 @layer base {
@@ -130,6 +194,134 @@
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply font-body;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+  html[data-scroll-behavior="smooth"] {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ── Dark mode image dimming ─────────────────────────────── */
+.dark img:not([data-no-dim]) {
+  filter: brightness(0.92) saturate(1.05);
+}
+.dark [data-logo] img,
+.dark .no-dim img {
+  filter: none;
+}
+
+/* ── Motion tokens ──────────────────────────────────────── */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Keyframes ──────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.animate-shimmer {
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-pop-in {
+  animation: pop-in var(--duration-slow) var(--ease-spring) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up var(--duration-slow) var(--ease-out-expo) both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-out) both;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up var(--duration-normal) var(--ease-out-expo) both;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scale-in var(--duration-normal) var(--ease-out-expo) both;
+}
+
+/* Page enter animation for template.tsx */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-page-enter {
+  animation: page-enter var(--duration-normal) var(--ease-out-expo) both;
+}
+
+/* Stagger children utility: set --stagger-index via style prop */
+.stagger-item {
+  animation-delay: calc(var(--stagger-index, 0) * 60ms);
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Scroll-reveal (driven by IntersectionObserver) ────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out-expo),
+    transform var(--duration-slow) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+[data-reveal="visible"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children within a reveal container */
+[data-reveal-stagger] > [data-reveal] {
+  transition-delay: calc(var(--reveal-index, 0) * 80ms);
 }

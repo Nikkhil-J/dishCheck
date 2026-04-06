@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DishCheck — Auth Screens Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #E23744;
+      --color-primary-dark: #C62D39;
+      --color-secondary: #FF6B35;
+      --color-accent: #FFB800;
+      --color-accent-light: #FFF0C2;
+      --color-success: #48C479;
+      --color-bg: #FFFFFF;
+      --color-bg-warm: #FFF8F0;
+      --color-bg-cream: #FFFAF5;
+      --color-bg-dark: #1C1C2B;
+      --color-text: #2D2D3A;
+      --color-text-secondary: #6B7280;
+      --color-text-muted: #9CA3AF;
+      --color-border: #F0F0F0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+      --shadow-xl: 0 20px 50px rgba(0,0,0,0.12);
+      --shadow-glow: 0 4px 20px rgba(226,55,68,0.25);
+      --font-display: 'Fredoka', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body); color: var(--color-text);
+      background: var(--color-bg); line-height: 1.6;
+      -webkit-font-smoothing: antialiased; min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; cursor: pointer; font-family: inherit; }
+
+    /* ============================================
+       SCREEN SWITCHER (for prototype navigation)
+       ============================================ */
+    .proto-tabs {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: var(--color-bg-dark); display: flex; justify-content: center;
+      gap: 0; padding: 0;
+    }
+    .proto-tab {
+      padding: 12px 32px; font-size: 13px; font-weight: 600;
+      color: rgba(255,255,255,0.5); background: none; cursor: pointer;
+      transition: all 0.2s; border-bottom: 2px solid transparent;
+    }
+    .proto-tab.active {
+      color: white; border-bottom-color: var(--color-primary);
+    }
+    .proto-tab:hover { color: rgba(255,255,255,0.8); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ============================================
+       AUTH LAYOUT
+       ============================================ */
+    .auth-page {
+      min-height: 100vh; display: flex; padding-top: 44px;
+    }
+    .auth-left {
+      flex: 1; display: none; position: relative; overflow: hidden;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-accent) 100%);
+    }
+    @media (min-width: 1024px) { .auth-left { display: flex; } }
+    .auth-left-content {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 60px; color: white; max-width: 520px;
+    }
+    .auth-left h2 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 700;
+      line-height: 1.15; margin-bottom: 20px;
+    }
+    .auth-left p {
+      font-size: 18px; opacity: 0.85; line-height: 1.7; margin-bottom: 40px;
+    }
+    .auth-features {
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .auth-feature {
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .auth-feature-icon {
+      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+      background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .auth-feature-text { font-size: 15px; opacity: 0.9; line-height: 1.5; }
+    .auth-feature-title { font-weight: 600; font-size: 16px; margin-bottom: 2px; opacity: 1; }
+    .auth-left-decor {
+      position: absolute; bottom: -60px; right: -60px;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .auth-left-decor-2 {
+      position: absolute; top: -40px; right: 100px;
+      width: 180px; height: 180px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .auth-left-stats {
+      display: flex; gap: 32px; margin-top: 48px;
+      padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .auth-stat-number {
+      font-family: var(--font-display); font-size: 28px; font-weight: 700;
+    }
+    .auth-stat-label { font-size: 13px; opacity: 0.6; }
+
+    .auth-right {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 40px 24px; background: var(--color-bg);
+    }
+    .auth-form-wrapper {
+      width: 100%; max-width: 420px;
+      animation: authFadeIn 0.5s var(--ease-smooth) both;
+    }
+    @keyframes authFadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-display); font-weight: 700; font-size: 28px;
+      color: var(--color-primary); margin-bottom: 36px;
+    }
+    .auth-logo svg { width: 38px; height: 38px; }
+
+    .auth-title {
+      font-family: var(--font-display); font-size: 30px; font-weight: 700;
+      color: var(--color-bg-dark); margin-bottom: 8px;
+    }
+    .auth-subtitle {
+      font-size: 15px; color: var(--color-text-secondary); margin-bottom: 32px;
+    }
+    .auth-subtitle a {
+      color: var(--color-primary); font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .auth-subtitle a:hover { opacity: 0.8; }
+
+    /* Google button */
+    .google-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 12px; padding: 13px 24px; border-radius: var(--radius-md);
+      background: white; border: 2px solid var(--color-border);
+      font-size: 15px; font-weight: 600; color: var(--color-text);
+      transition: all 0.2s; cursor: pointer;
+    }
+    .google-btn:hover {
+      border-color: #D1D5DB; box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+    .google-btn svg { width: 20px; height: 20px; }
+
+    .divider {
+      display: flex; align-items: center; gap: 16px;
+      margin: 24px 0; color: var(--color-text-muted); font-size: 13px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--color-border);
+    }
+
+    /* Form fields */
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block; font-size: 14px; font-weight: 600;
+      color: var(--color-text); margin-bottom: 8px;
+    }
+    .form-input-wrapper { position: relative; }
+    .form-input {
+      width: 100%; height: 48px; border: 2px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 0 16px;
+      font-size: 15px; font-family: var(--font-body);
+      background: var(--color-bg); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(226,55,68,0.06);
+    }
+    .form-input::placeholder { color: var(--color-text-muted); }
+    .form-input-icon {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--color-text-muted); cursor: pointer;
+    }
+    .form-hint {
+      font-size: 12px; color: var(--color-text-muted); margin-top: 6px;
+    }
+    .form-error {
+      font-size: 12px; color: var(--color-primary); margin-top: 6px;
+      display: none;
+    }
+
+    .form-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+
+    .form-check {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 24px;
+    }
+    .form-check input[type="checkbox"] {
+      width: 18px; height: 18px; accent-color: var(--color-primary);
+    }
+    .form-check label {
+      font-size: 14px; color: var(--color-text-secondary);
+    }
+    .form-check a {
+      color: var(--color-primary); font-weight: 600;
+    }
+
+    .forgot-link {
+      font-size: 13px; color: var(--color-primary); font-weight: 600;
+      float: right; margin-top: -4px; transition: opacity 0.2s;
+    }
+    .forgot-link:hover { opacity: 0.7; }
+
+    /* Submit button */
+    .auth-submit {
+      width: 100%; padding: 14px 24px; border-radius: var(--radius-md);
+      background: var(--color-primary); color: white;
+      font-size: 16px; font-weight: 700; font-family: var(--font-display);
+      transition: all 0.25s var(--ease-smooth); cursor: pointer;
+      letter-spacing: 0.3px;
+    }
+    .auth-submit:hover {
+      background: var(--color-primary-dark); transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+    .auth-submit:active { transform: translateY(0); }
+
+    .auth-footer {
+      text-align: center; margin-top: 32px; font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    .auth-footer a { color: var(--color-primary); font-weight: 600; }
+
+    /* ============================================
+       FORGOT PASSWORD SCREEN
+       ============================================ */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 14px; font-weight: 500; color: var(--color-text-secondary);
+      margin-bottom: 32px; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--color-primary); }
+    .success-state {
+      text-align: center; padding: 40px 0;
+    }
+    .success-icon {
+      width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px;
+      background: var(--color-success); color: white;
+      display: flex; align-items: center; justify-content: center; font-size: 32px;
+    }
+    .success-title {
+      font-family: var(--font-display); font-size: 24px; font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .success-text {
+      font-size: 15px; color: var(--color-text-secondary);
+      margin-bottom: 24px; max-width: 320px; margin-left: auto; margin-right: auto;
+    }
+    .success-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 15px; font-weight: 600; color: var(--color-primary);
+    }
+
+    /* ============================================
+       PASSWORD STRENGTH
+       ============================================ */
+    .password-strength {
+      display: flex; gap: 6px; margin-top: 8px;
+    }
+    .strength-bar {
+      flex: 1; height: 4px; border-radius: 2px; background: var(--color-border);
+      transition: background 0.3s;
+    }
+    .strength-bar.active { background: var(--color-primary); }
+    .strength-bar.active.medium { background: var(--color-accent); }
+    .strength-bar.active.strong { background: var(--color-success); }
+    .strength-label {
+      font-size: 12px; margin-top: 4px; color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Proto screen switcher -->
+  <div class="proto-tabs">
+    <button class="proto-tab active" onclick="showScreen('login')">Login</button>
+    <button class="proto-tab" onclick="showScreen('signup')">Sign Up</button>
+    <button class="proto-tab" onclick="showScreen('forgot')">Forgot Password</button>
+    <button class="proto-tab" onclick="showScreen('forgot-success')">Reset Sent</button>
+  </div>
+
+  <!-- ===== LOGIN ===== -->
+  <div class="screen active" id="login">
+    <div class="auth-page">
+      <div class="auth-left">
+        <div class="auth-left-content">
+          <h2>Welcome back, foodie!</h2>
+          <p>Pick up right where you left off. Your saved dishes, badges, and reviews are waiting.</p>
+          <div class="auth-features">
+            <div class="auth-feature">
+              <div class="auth-feature-icon">📸</div>
+              <div>
+                <div class="auth-feature-title">Photo-first reviews</div>
+                <div class="auth-feature-text">Every dish tells a story with real photos from real diners.</div>
+              </div>
+            </div>
+            <div class="auth-feature">
+              <div class="auth-feature-icon">🏆</div>
+              <div>
+                <div class="auth-feature-title">Level up & earn badges</div>
+                <div class="auth-feature-text">Get recognized for your contributions to the food community.</div>
+              </div>
+            </div>
+            <div class="auth-feature">
+              <div class="auth-feature-icon">📊</div>
+              <div>
+                <div class="auth-feature-title">Sub-ratings that matter</div>
+                <div class="auth-feature-text">Taste, portion, and value — know exactly what you're getting.</div>
+              </div>
+            </div>
+          </div>
+          <div class="auth-left-stats">
+            <div>
+              <div class="auth-stat-number">2,500+</div>
+              <div class="auth-stat-label">Reviews</div>
+            </div>
+            <div>
+              <div class="auth-stat-number">850+</div>
+              <div class="auth-stat-label">Dishes</div>
+            </div>
+            <div>
+              <div class="auth-stat-number">5,000+</div>
+              <div class="auth-stat-label">Food Lovers</div>
+            </div>
+          </div>
+        </div>
+        <div class="auth-left-decor"></div>
+        <div class="auth-left-decor-2"></div>
+      </div>
+      <div class="auth-right">
+        <div class="auth-form-wrapper">
+          <a href="01-landing.html" class="auth-logo">
+            <svg viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="10" fill="#E23744"/><path d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z" fill="white" opacity="0.9"/><path d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z" fill="white" opacity="0.7"/><circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9"/></svg>
+            DishCheck
+          </a>
+          <h1 class="auth-title">Log in</h1>
+          <p class="auth-subtitle">
+            Don't have an account? <a href="#" onclick="showScreen('signup')">Sign up</a>
+          </p>
+
+          <button class="google-btn">
+            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+
+          <div class="divider">or</div>
+
+          <form>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <div class="form-input-wrapper">
+                <input class="form-input" type="email" placeholder="you@example.com">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                Password
+                <a href="#" class="forgot-link" onclick="showScreen('forgot')">Forgot?</a>
+              </label>
+              <div class="form-input-wrapper">
+                <input class="form-input" type="password" placeholder="Enter your password">
+                <span class="form-input-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+              </div>
+            </div>
+            <button type="button" class="auth-submit">Log in</button>
+          </form>
+
+          <div class="auth-footer">
+            By continuing, you agree to DishCheck's<br>
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SIGNUP ===== -->
+  <div class="screen" id="signup">
+    <div class="auth-page">
+      <div class="auth-left">
+        <div class="auth-left-content">
+          <h2>Join the food community</h2>
+          <p>Help others discover amazing dishes. Share your reviews, earn badges, and become a local food authority.</p>
+          <div class="auth-features">
+            <div class="auth-feature">
+              <div class="auth-feature-icon">✍️</div>
+              <div>
+                <div class="auth-feature-title">Review specific dishes</div>
+                <div class="auth-feature-text">Not just restaurants — tell people exactly which dish to order.</div>
+              </div>
+            </div>
+            <div class="auth-feature">
+              <div class="auth-feature-icon">🎯</div>
+              <div>
+                <div class="auth-feature-title">Personalized for you</div>
+                <div class="auth-feature-text">Get dish recommendations based on your taste and your area.</div>
+              </div>
+            </div>
+            <div class="auth-feature">
+              <div class="auth-feature-icon">❤️</div>
+              <div>
+                <div class="auth-feature-title">Save your favorites</div>
+                <div class="auth-feature-text">Build a wishlist of dishes to try and share with friends.</div>
+              </div>
+            </div>
+          </div>
+          <div class="auth-left-stats">
+            <div>
+              <div class="auth-stat-number">2,500+</div>
+              <div class="auth-stat-label">Reviews</div>
+            </div>
+            <div>
+              <div class="auth-stat-number">850+</div>
+              <div class="auth-stat-label">Dishes</div>
+            </div>
+            <div>
+              <div class="auth-stat-number">5,000+</div>
+              <div class="auth-stat-label">Food Lovers</div>
+            </div>
+          </div>
+        </div>
+        <div class="auth-left-decor"></div>
+        <div class="auth-left-decor-2"></div>
+      </div>
+      <div class="auth-right">
+        <div class="auth-form-wrapper">
+          <a href="01-landing.html" class="auth-logo">
+            <svg viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="10" fill="#E23744"/><path d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z" fill="white" opacity="0.9"/><path d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z" fill="white" opacity="0.7"/><circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9"/></svg>
+            DishCheck
+          </a>
+          <h1 class="auth-title">Create your account</h1>
+          <p class="auth-subtitle">
+            Already have an account? <a href="#" onclick="showScreen('login')">Log in</a>
+          </p>
+
+          <button class="google-btn">
+            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+
+          <div class="divider">or</div>
+
+          <form>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First name</label>
+                <input class="form-input" type="text" placeholder="Aanya">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last name</label>
+                <input class="form-input" type="text" placeholder="Sharma">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div class="form-input-wrapper">
+                <input class="form-input" type="password" placeholder="Min 8 characters">
+                <span class="form-input-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+              </div>
+              <div class="password-strength">
+                <div class="strength-bar active"></div>
+                <div class="strength-bar active medium"></div>
+                <div class="strength-bar"></div>
+                <div class="strength-bar"></div>
+              </div>
+              <div class="strength-label">Medium — add a number or symbol</div>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="terms" checked>
+              <label for="terms">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></label>
+            </div>
+            <button type="button" class="auth-submit">Create account</button>
+          </form>
+
+          <div class="auth-footer">
+            We'll never share your data with third parties.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FORGOT PASSWORD ===== -->
+  <div class="screen" id="forgot">
+    <div class="auth-page">
+      <div class="auth-left">
+        <div class="auth-left-content">
+          <h2>No worries, it happens!</h2>
+          <p>We'll send you a link to reset your password. You'll be back to reviewing dishes in no time.</p>
+          <div style="font-size: 120px; margin-top: 40px; text-align: center; opacity: 0.8;">🔐</div>
+        </div>
+        <div class="auth-left-decor"></div>
+      </div>
+      <div class="auth-right">
+        <div class="auth-form-wrapper">
+          <a href="01-landing.html" class="auth-logo">
+            <svg viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="10" fill="#E23744"/><path d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z" fill="white" opacity="0.9"/><path d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z" fill="white" opacity="0.7"/><circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9"/></svg>
+            DishCheck
+          </a>
+          <a href="#" class="back-link" onclick="showScreen('login')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+            Back to login
+          </a>
+          <h1 class="auth-title">Reset password</h1>
+          <p class="auth-subtitle">
+            Enter the email you used to sign up and we'll send you a reset link.
+          </p>
+          <form>
+            <div class="form-group">
+              <label class="form-label">Email address</label>
+              <input class="form-input" type="email" placeholder="you@example.com">
+            </div>
+            <button type="button" class="auth-submit" onclick="showScreen('forgot-success')">Send reset link</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FORGOT PASSWORD - SUCCESS ===== -->
+  <div class="screen" id="forgot-success">
+    <div class="auth-page">
+      <div class="auth-left">
+        <div class="auth-left-content">
+          <h2>Check your inbox!</h2>
+          <p>We've sent you a password reset link. Click it to set a new password and get back to your food journey.</p>
+          <div style="font-size: 120px; margin-top: 40px; text-align: center; opacity: 0.8;">📬</div>
+        </div>
+        <div class="auth-left-decor"></div>
+      </div>
+      <div class="auth-right">
+        <div class="auth-form-wrapper">
+          <a href="01-landing.html" class="auth-logo">
+            <svg viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="10" fill="#E23744"/><path d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z" fill="white" opacity="0.9"/><path d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z" fill="white" opacity="0.7"/><circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9"/></svg>
+            DishCheck
+          </a>
+          <div class="success-state">
+            <div class="success-icon">✓</div>
+            <h2 class="success-title">Check your email</h2>
+            <p class="success-text">
+              We sent a password reset link to <strong>you@example.com</strong>. Click the link in the email to set a new password.
+            </p>
+            <a href="#" class="success-link" onclick="showScreen('login')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+              Back to login
+            </a>
+          </div>
+          <div class="auth-footer" style="margin-top:48px">
+            Didn't receive an email? Check spam or <a href="#" onclick="showScreen('forgot')">try again</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.proto-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      const tabs = document.querySelectorAll('.proto-tab');
+      const map = { login: 0, signup: 1, forgot: 2, 'forgot-success': 3 };
+      if (map[id] !== undefined) tabs[map[id]].classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

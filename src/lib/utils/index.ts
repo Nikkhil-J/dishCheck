@@ -1,5 +1,4 @@
 export { cn } from '../utils'
-import type { Timestamp } from 'firebase/firestore'
 import {
   REVIEW_EDIT_WINDOW_MS,
   REVIEW_PHOTO_MAX_MB,
@@ -45,8 +44,10 @@ export function computeTopTags(tagArrays: string[][]): string[] {
 /**
  * Returns true if the review is still within the editable window (24 hours).
  */
-export function canEditReview(createdAt: Timestamp): boolean {
-  const ageMs = Date.now() - createdAt.toMillis()
+export function canEditReview(createdAt: string): boolean {
+  const createdAtMs = Date.parse(createdAt)
+  if (Number.isNaN(createdAtMs)) return false
+  const ageMs = Date.now() - createdAtMs
   return ageMs < REVIEW_EDIT_WINDOW_MS
 }
 
@@ -89,10 +90,12 @@ export function validatePhotoFile(file: File): { valid: boolean; error: string |
 }
 
 /**
- * Formats a Firestore Timestamp as a relative time string (e.g. "2 hours ago").
+ * Formats an ISO timestamp as a relative time string (e.g. "2 hours ago").
  */
-export function formatRelativeTime(ts: Timestamp): string {
-  const diffMs   = Date.now() - ts.toMillis()
+export function formatRelativeTime(ts: string): string {
+  const timestampMs = Date.parse(ts)
+  if (Number.isNaN(timestampMs)) return 'just now'
+  const diffMs   = Date.now() - timestampMs
   const diffSecs = Math.floor(diffMs / 1000)
   const diffMins = Math.floor(diffSecs / 60)
   const diffHrs  = Math.floor(diffMins / 60)
@@ -105,16 +108,20 @@ export function formatRelativeTime(ts: Timestamp): string {
   if (diffMins < 60)    return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`
   if (diffHrs < 24)     return `${diffHrs} hour${diffHrs === 1 ? '' : 's'} ago`
   if (diffDays < 7)     return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`
-  if (diffWeeks < 4)    return `${diffWeeks} week${diffWeeks === 1 ? '' : 's'} ago`
+  if (diffDays < 28)    return `${diffWeeks} week${diffWeeks === 1 ? '' : 's'} ago`
+  if (diffDays < 45)    return '1 month ago'
   if (diffMonths < 12)  return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`
   return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`
 }
 
 /**
  * Converts a string to a URL-safe lowercase slug.
+ * Handles Unicode/diacritics via NFD decomposition.
  */
 export function slugify(str: string): string {
   return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, '')

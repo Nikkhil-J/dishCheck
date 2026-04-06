@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DishCheck — Restaurant Page Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #E23744; --color-primary-dark: #C62D39;
+      --color-secondary: #FF6B35; --color-accent: #FFB800;
+      --color-accent-light: #FFF0C2; --color-success: #48C479;
+      --color-bg: #FFFFFF; --color-bg-warm: #FFF8F0;
+      --color-bg-cream: #FFFAF5; --color-bg-dark: #1C1C2B;
+      --color-text: #2D2D3A; --color-text-secondary: #6B7280;
+      --color-text-muted: #9CA3AF; --color-border: #F0F0F0;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 24px; --radius-pill: 999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+      --shadow-glow: 0 4px 20px rgba(226,55,68,0.25);
+      --font-display: 'Fredoka', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); color: var(--color-text); background: #F7F7F8; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; cursor: pointer; font-family: inherit; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; border-radius: var(--radius-pill); padding: 10px 24px; transition: all 0.25s var(--ease-smooth); white-space: nowrap; }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover { background: var(--color-primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+    .btn-outline { background: transparent; color: var(--color-text); border: 2px solid var(--color-border); }
+    .btn-outline:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease-smooth), transform 0.6s var(--ease-smooth); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; } .reveal-delay-2 { transition-delay: 0.2s; }
+
+    /* Back nav */
+    .back-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); height: 56px; display: flex; align-items: center; }
+    .back-nav-inner { max-width: 1000px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 12px; width: 100%; }
+    .back-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--color-bg-cream); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); transition: all 0.2s; }
+    .back-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .back-nav-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+
+    /* Hero */
+    .rest-hero { margin-top: 56px; height: 240px; background: linear-gradient(135deg, #FFE4E6, #FED7AA, #FDE68A); position: relative; }
+    .rest-hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.3), transparent); }
+
+    /* Info */
+    .rest-info { background: white; border-radius: var(--radius-xl) var(--radius-xl) 0 0; margin-top: -32px; position: relative; z-index: 10; padding: 28px 0 0; }
+    .rest-name { font-family: var(--font-display); font-size: clamp(24px, 4vw, 32px); font-weight: 700; color: var(--color-bg-dark); }
+    .rest-cuisine { font-size: 15px; color: var(--color-text-secondary); margin-top: 4px; }
+    .rest-meta { display: flex; align-items: center; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+    .rest-meta-item { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+    .rest-meta-icon { width: 18px; height: 18px; color: var(--color-text-muted); }
+    .rest-rating-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--color-success); color: white; padding: 4px 10px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; }
+    .rest-actions { display: flex; gap: 10px; margin-top: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border); }
+
+    /* Stats */
+    .rest-stats { display: flex; gap: 0; margin: 20px 0; background: var(--color-bg-cream); border-radius: var(--radius-lg); overflow: hidden; }
+    .rest-stat { flex: 1; text-align: center; padding: 16px 12px; }
+    .rest-stat-num { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--color-bg-dark); }
+    .rest-stat-label { font-size: 12px; color: var(--color-text-muted); margin-top: 2px; }
+
+    /* Menu / Dishes */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin: 28px 0 16px; }
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--color-bg-dark); }
+    .sort-select { padding: 8px 16px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); font-size: 13px; font-family: var(--font-body); background: white; color: var(--color-text-secondary); cursor: pointer; }
+
+    .dish-row { display: flex; gap: 16px; background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: 16px; margin-bottom: 12px; transition: all 0.2s; cursor: pointer; align-items: center; }
+    .dish-row:hover { box-shadow: var(--shadow-md); border-color: transparent; transform: translateY(-2px); }
+    .dish-row-img { width: 90px; height: 90px; border-radius: var(--radius-md); flex-shrink: 0; }
+    .dish-row-body { flex: 1; min-width: 0; }
+    .dish-row-name { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+    .dish-row-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .dish-row-tag { padding: 2px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; background: rgba(226,55,68,0.08); color: var(--color-primary); }
+    .dish-row-tag.veg { background: rgba(72,196,121,0.1); color: var(--color-success); }
+    .dish-row-bottom { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+    .dish-row-rating { display: flex; align-items: center; gap: 3px; font-size: 13px; font-weight: 700; color: var(--color-success); }
+    .dish-row-reviews { font-size: 12px; color: var(--color-text-muted); }
+    .dish-row-price { font-weight: 700; font-size: 15px; margin-left: auto; }
+    .dish-row-heart { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); flex-shrink: 0; background: white; transition: all 0.2s; }
+    .dish-row-heart:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .dish-row-heart.liked { color: var(--color-primary); border-color: var(--color-primary); background: rgba(226,55,68,0.06); }
+
+    /* Location card */
+    .location-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: 20px; margin: 20px 0; }
+    .location-card-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin-bottom: 12px; }
+    .location-map { height: 160px; background: linear-gradient(135deg, #E0E7FF, #C7D2FE); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 14px; margin-bottom: 12px; }
+    .location-address { font-size: 14px; color: var(--color-text-secondary); line-height: 1.5; }
+
+    /* Mobile nav */
+    .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); border-top: 1px solid var(--color-border); z-index: 100; padding: 6px 0 max(6px, env(safe-area-inset-bottom)); }
+    @media (min-width: 768px) { .mobile-nav { display: none; } }
+    .mobile-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; font-size: 10px; font-weight: 500; color: var(--color-text-muted); background: none; }
+    .mobile-nav-item svg { width: 22px; height: 22px; }
+    .review-btn-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; margin-top: -22px; box-shadow: var(--shadow-glow); }
+    @media (max-width: 767px) { body { padding-bottom: 70px; } }
+  </style>
+</head>
+<body>
+
+  <nav class="back-nav">
+    <div class="back-nav-inner">
+      <a href="02-explore.html" class="back-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></a>
+      <span class="back-nav-title">Paradise Biryani</span>
+    </div>
+  </nav>
+
+  <div class="rest-hero">
+    <div class="rest-hero-overlay"></div>
+  </div>
+
+  <div class="rest-info">
+    <div class="container">
+      <div class="reveal">
+        <h1 class="rest-name">Paradise Biryani</h1>
+        <p class="rest-cuisine">North Indian • Biryani • Mughlai</p>
+        <div class="rest-meta">
+          <span class="rest-rating-badge">★ 4.6</span>
+          <span class="rest-meta-item"><svg class="rest-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Indiranagar, Bengaluru</span>
+          <span class="rest-meta-item"><svg class="rest-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 11am – 11pm</span>
+          <span class="rest-meta-item">₹₹ (avg ₹350)</span>
+        </div>
+        <div class="rest-actions">
+          <a href="#" class="btn btn-primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Write Review</a>
+          <button class="btn btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg> Share</button>
+          <button class="btn btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 13v-2z"/></svg> Directions</button>
+        </div>
+      </div>
+
+      <div class="rest-stats reveal">
+        <div class="rest-stat"><div class="rest-stat-num">24</div><div class="rest-stat-label">Dishes reviewed</div></div>
+        <div class="rest-stat"><div class="rest-stat-num">186</div><div class="rest-stat-label">Total reviews</div></div>
+        <div class="rest-stat"><div class="rest-stat-num">4.6</div><div class="rest-stat-label">Avg rating</div></div>
+      </div>
+
+      <!-- Popular Dishes -->
+      <div class="section-header reveal">
+        <h2 class="section-title">Popular Dishes</h2>
+        <select class="sort-select"><option>Sort: Most Reviewed</option><option>Sort: Highest Rated</option><option>Sort: Price Low–High</option></select>
+      </div>
+
+      <div class="dish-row reveal">
+        <div class="dish-row-img" style="background:linear-gradient(135deg,#FECDD3,#FDA4AF)"></div>
+        <div class="dish-row-body">
+          <div class="dish-row-name">Hyderabadi Dum Biryani</div>
+          <div class="dish-row-tags"><span class="dish-row-tag">🔥 Trending</span><span class="dish-row-tag">Must Try</span></div>
+          <div class="dish-row-bottom">
+            <span class="dish-row-rating">★ 4.8</span>
+            <span class="dish-row-reviews">64 reviews</span>
+            <span class="dish-row-price">₹350</span>
+          </div>
+        </div>
+        <div class="dish-row-heart liked"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+      </div>
+      <div class="dish-row reveal reveal-delay-1">
+        <div class="dish-row-img" style="background:linear-gradient(135deg,#FDE68A,#FCD34D)"></div>
+        <div class="dish-row-body">
+          <div class="dish-row-name">Chicken 65</div>
+          <div class="dish-row-tags"><span class="dish-row-tag">Spicy</span><span class="dish-row-tag">Crispy</span></div>
+          <div class="dish-row-bottom">
+            <span class="dish-row-rating">★ 4.5</span>
+            <span class="dish-row-reviews">38 reviews</span>
+            <span class="dish-row-price">₹280</span>
+          </div>
+        </div>
+        <div class="dish-row-heart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+      </div>
+      <div class="dish-row reveal reveal-delay-2">
+        <div class="dish-row-img" style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0)"></div>
+        <div class="dish-row-body">
+          <div class="dish-row-name">Paneer Butter Masala</div>
+          <div class="dish-row-tags"><span class="dish-row-tag veg">🟢 Veg</span><span class="dish-row-tag">Rich</span></div>
+          <div class="dish-row-bottom">
+            <span class="dish-row-rating">★ 4.3</span>
+            <span class="dish-row-reviews">22 reviews</span>
+            <span class="dish-row-price">₹320</span>
+          </div>
+        </div>
+        <div class="dish-row-heart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+      </div>
+      <div class="dish-row reveal">
+        <div class="dish-row-img" style="background:linear-gradient(135deg,#DDD6FE,#C4B5FD)"></div>
+        <div class="dish-row-body">
+          <div class="dish-row-name">Double Ka Meetha</div>
+          <div class="dish-row-tags"><span class="dish-row-tag veg">🟢 Veg</span><span class="dish-row-tag">Dessert</span></div>
+          <div class="dish-row-bottom">
+            <span class="dish-row-rating">★ 4.4</span>
+            <span class="dish-row-reviews">18 reviews</span>
+            <span class="dish-row-price">₹180</span>
+          </div>
+        </div>
+        <div class="dish-row-heart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+      </div>
+      <div class="dish-row reveal">
+        <div class="dish-row-img" style="background:linear-gradient(135deg,#FBCFE8,#F9A8D4)"></div>
+        <div class="dish-row-body">
+          <div class="dish-row-name">Mutton Haleem</div>
+          <div class="dish-row-tags"><span class="dish-row-tag">Slow-cooked</span></div>
+          <div class="dish-row-bottom">
+            <span class="dish-row-rating">★ 4.6</span>
+            <span class="dish-row-reviews">14 reviews</span>
+            <span class="dish-row-price">₹300</span>
+          </div>
+        </div>
+        <div class="dish-row-heart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+      </div>
+
+      <!-- Location -->
+      <div class="location-card reveal">
+        <div class="location-card-title">Location</div>
+        <div class="location-map">Map would render here</div>
+        <div class="location-address">No. 42, 100 Feet Road, Indiranagar, Bengaluru 560038<br>Near Metro Station</div>
+      </div>
+
+      <div style="height:60px"></div>
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <button class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+    <button class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Explore</button>
+    <button class="mobile-nav-item"><div class="review-btn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>Review</button>
+    <button class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Saved</button>
+    <button class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+  </nav>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

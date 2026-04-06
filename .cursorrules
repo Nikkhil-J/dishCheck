@@ -20,6 +20,19 @@ Tailwind CSS, Zustand, and TanStack Query. Deployed on Vercel.
 - Constants (tags, badges, levels) come from lib/constants/index.ts.
   Never hardcode these values inline.
 
+## shadcn UI rules (non-negotiable)
+- ALL basic UI elements MUST use shadcn components from components/ui/.
+  Never use raw `<button>`, `<input>`, `<select>`, or `<label>` in pages
+  or feature components. Use `<Button>`, `<Input>`, `<Select>`, `<Label>`.
+- Available shadcn primitives: Button, Input, Badge, Label, Select,
+  Sheet, DropdownMenu. If a primitive doesn't exist, add it via
+  `npx shadcn add <component>` before using it.
+- For composition (e.g. Button as Link), use the `render` prop:
+  `<Button render={<Link href="..." />}>`. Never use `asChild`.
+- Tailwind overrides via `className` are fine for one-off tweaks, but
+  the base component MUST come from shadcn. Never recreate Button/Input
+  from scratch with raw elements + Tailwind.
+
 ## Code style
 - TypeScript strict mode. No `any`. No `ts-ignore`. No implicit returns.
 - Functional components only. No class components.

@@ -14,14 +14,14 @@ export function TagCloud({ tags, maxVisible = 5 }: TagCloudProps) {
   const hidden = tags.length - maxVisible
 
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap gap-2">
       {visible.map((tag) => (
         <TagPill key={tag} label={tag} />
       ))}
       {!expanded && hidden > 0 && (
         <button
           onClick={() => setExpanded(true)}
-          className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-500 hover:bg-gray-200"
+          className="rounded-pill border border-border bg-bg-cream px-3 py-1.5 text-xs font-medium text-text-muted hover:text-text-secondary"
         >
           +{hidden} more
         </button>

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /settings
+Disallow: /write-review
+Disallow: /onboarding
+
+Sitemap: https://dishcheck.in/sitemap.xml

@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
+import { MobileBottomNav } from './MobileBottomNav'
 
 interface PageShellProps {
   children: ReactNode
@@ -8,10 +9,11 @@ interface PageShellProps {
 
 export function PageShell({ children }: PageShellProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
+    <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-[70px] md:pb-0">{children}</main>
       <Footer />
+      <MobileBottomNav />
     </div>
   )
 }
