@@ -5,40 +5,74 @@ interface LogoProps {
   showWordmark?: boolean
   wordmarkClassName?: string
   size?: 'sm' | 'md' | 'lg'
+  variant?: 'full' | 'icon'
 }
 
 const sizes = {
-  sm: { icon: 28, text: 'text-lg' },
-  md: { icon: 34, text: 'text-xl' },
-  lg: { icon: 40, text: 'text-2xl' },
+  sm: { icon: 32, text: 'text-xl' },
+  md: { icon: 42, text: 'text-2xl' },
+  lg: { icon: 56, text: 'text-3xl' },
 }
 
-export function Logo({ className, showWordmark = true, wordmarkClassName, size = 'md' }: LogoProps) {
-  const s = sizes[size]
+function CraviaMark({ size }: { size: number }) {
   return (
-    <span className={cn('flex items-center gap-2 font-display font-bold text-primary', className)}>
-      <svg
-        width={s.icon}
-        height={s.icon}
-        viewBox="0 0 34 34"
-        fill="none"
-        aria-hidden="true"
-        className="shrink-0"
-      >
-        <rect width="34" height="34" rx="10" fill="currentColor" />
-        <path
-          d="M10 12.5C10 11.67 10.67 11 11.5 11H15.5C16.33 11 17 11.67 17 12.5V22.5C17 23.33 16.33 24 15.5 24H11.5C10.67 24 10 23.33 10 22.5V12.5Z"
-          fill="white"
-          opacity="0.9"
-        />
-        <path
-          d="M18.5 9.5C18.5 8.67 19.17 8 20 8H22C22.83 8 23.5 8.67 23.5 9.5V22.5C23.5 23.33 22.83 24 22 24H20C19.17 24 18.5 23.33 18.5 22.5V9.5Z"
-          fill="white"
-          opacity="0.7"
-        />
-        <circle cx="13.5" cy="8.5" r="1.5" fill="white" opacity="0.9" />
-      </svg>
-      {showWordmark && <span className={cn(s.text, wordmarkClassName)}>Cravia</span>}
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 110"
+      fill="none"
+      aria-hidden="true"
+      className="shrink-0"
+    >
+      {/* Aroma wisps */}
+      <path d="M36 8 C33 2 37 -2 35 -7" fill="none" stroke="#EF9F27" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M44 6 C46 0 42 -4 44 -9" fill="none" stroke="#FAC775" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M52 8 C55 2 51 -2 53 -7" fill="none" stroke="#EF9F27" strokeWidth="2" strokeLinecap="round"/>
+      {/* Magnifying glass ring */}
+      <circle cx="44" cy="46" r="32" fill="none" stroke="#D85A30" strokeWidth="6"/>
+      {/* Lens fill */}
+      <circle cx="44" cy="46" r="26" fill="#3D1F14"/>
+      {/* Plate rings inside lens */}
+      <circle cx="44" cy="46" r="26" fill="none" stroke="#F0997B" strokeWidth="2"/>
+      <circle cx="44" cy="46" r="17" fill="none" stroke="#EF9F27" strokeWidth="1.5" opacity="0.6"/>
+      {/* Glowing dish center */}
+      <circle cx="44" cy="46" r="10" fill="#D85A30"/>
+      <circle cx="44" cy="46" r="7" fill="#EF9F27"/>
+      <circle cx="44" cy="46" r="3.5" fill="#FAC775"/>
+      {/* Lens highlight */}
+      <ellipse cx="35" cy="37" rx="6" ry="4" fill="#FAC775" opacity="0.15" transform="rotate(-30 35 37)"/>
+      {/* Handle */}
+      <rect x="66" y="66" width="8" height="32" rx="4" fill="#D85A30" transform="rotate(45 66 66)"/>
+    </svg>
+  )
+}
+
+export function Logo({
+  className,
+  showWordmark = true,
+  wordmarkClassName,
+  size = 'md',
+  variant = 'full',
+}: LogoProps) {
+  const s = sizes[size]
+  const renderWordmark = variant === 'full' && showWordmark
+
+  return (
+    <span className={cn('flex items-center gap-2.5', className)}>
+      <CraviaMark size={s.icon} />
+      {renderWordmark && (
+        <span
+          className={cn(
+            // APPROVED HARDCODED COLOR — brand wordmark requires specific palette
+            'text-[#993C1D] dark:text-[#FAC775]',
+            s.text,
+            wordmarkClassName,
+          )}
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 700 }}
+        >
+          Cravia
+        </span>
+      )}
     </span>
   )
 }

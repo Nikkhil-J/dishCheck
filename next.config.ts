@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import withSerwistInit from "@serwist/next";
 
 const nextConfig: NextConfig = {
   images: {
@@ -19,7 +20,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+const withSerwist = withSerwistInit({
+  swSrc: 'src/app/sw.ts',
+  swDest: 'public/sw.js',
+  disable: process.env.NODE_ENV === 'development',
+});
+
+export default withSentryConfig(withSerwist(nextConfig), {
   org: process.env.SENTRY_ORG ?? 'cravia',
   project: process.env.SENTRY_PROJECT ?? 'cravia-web',
   silent: !process.env.CI,

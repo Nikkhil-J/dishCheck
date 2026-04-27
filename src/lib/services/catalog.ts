@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { dishRepository, restaurantRepository, reviewRepository } from '@/lib/repositories'
+import { dishRepository, restaurantRepository, restaurantSearchRepository, reviewRepository } from '@/lib/repositories'
 import type { DietaryType, Dish, PriceRange, Restaurant, Review, SearchFilters } from '@/lib/types'
 import { SORT_OPTIONS } from '@/lib/constants'
 import { listCityAreas, resolveCity } from './city'
@@ -29,6 +29,50 @@ export async function listRestaurants(params?: ListRestaurantsParams): Promise<R
     city,
     areas: listCityAreas(city),
     items,
+  }
+}
+
+export type RestaurantSortOption = 'most-reviewed' | 'newest' | 'alphabetical'
+
+export interface SearchRestaurantsParams {
+  query?: string | null
+  city?: string | null
+  userCity?: string | null
+  area?: string | null
+  cuisine?: string | null
+  sortBy?: RestaurantSortOption
+  cursorId?: string | null
+  limit?: number
+}
+
+export interface SearchRestaurantsResult {
+  city: string
+  areas: readonly string[]
+  items: Restaurant[]
+  hasMore: boolean
+  nextCursorId: string | null
+}
+
+export async function searchRestaurants(params?: SearchRestaurantsParams): Promise<SearchRestaurantsResult> {
+  const city = resolveCity({ requestedCity: params?.city, userCity: params?.userCity })
+  const area = params?.area?.trim() || null
+  const queryText = params?.query?.trim() ?? ''
+  const result = await restaurantSearchRepository.search({
+    query: queryText,
+    city,
+    cuisine: params?.cuisine ?? null,
+    area,
+    sortBy: params?.sortBy ?? 'most-reviewed',
+    cursor: params?.cursorId ?? undefined,
+    limit: params?.limit,
+  })
+
+  return {
+    city,
+    areas: listCityAreas(city),
+    items: result.data,
+    hasMore: result.hasMore,
+    nextCursorId: result.nextCursor ?? null,
   }
 }
 

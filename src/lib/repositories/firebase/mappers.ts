@@ -37,6 +37,9 @@ export function mapDish(entity: Dish): Dish {
 export function mapReview(entity: Review): Review {
   return {
     ...entity,
+    photoUrl: entity.photoUrl ?? null,
+    billUrl: entity.billUrl ?? null,
+    isVerified: entity.isVerified ?? false,
     createdAt: toIso(entity.createdAt as MaybeTimestamp),
     editedAt: toIsoOrNull(entity.editedAt as MaybeTimestamp),
   }

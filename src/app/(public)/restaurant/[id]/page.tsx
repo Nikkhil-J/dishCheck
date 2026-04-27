@@ -4,8 +4,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Building2, MapPin, Phone, Globe } from 'lucide-react'
 import { getRestaurantDetails, listRestaurantDishes } from '@/lib/services/catalog'
-import { DishCard } from '@/components/features/DishCard'
+import { RestaurantMenu } from '@/components/features/RestaurantMenu'
+import { ReviewDishPicker } from '@/components/features/ReviewDishPicker'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { MobileBackButton } from '@/components/ui/MobileBackButton'
 import { ROUTES } from '@/lib/constants/routes'
 
 export const revalidate = 3600
@@ -55,6 +57,7 @@ export default async function RestaurantPage({ params }: PageProps) {
     <div>
       {/* Hero */}
       <div className="relative h-56 w-full overflow-hidden bg-gradient-to-r from-bg-cream via-accent-light to-primary-light sm:h-64">
+        <MobileBackButton variant="floating" />
         {restaurant.coverImage && (
           <Image src={restaurant.coverImage} alt={restaurant.name} fill sizes="100vw" priority className="object-cover" />
         )}
@@ -64,6 +67,13 @@ export default async function RestaurantPage({ params }: PageProps) {
       {/* Info */}
       <div className="relative -mt-8 rounded-t-xl bg-surface">
         <div className="mx-auto max-w-[1000px] px-4 pt-6 sm:px-6 sm:pt-8">
+          {/* Breadcrumb */}
+          <nav className="mb-4 flex min-w-0 items-center gap-1.5 text-xs text-text-muted sm:gap-2 sm:text-sm">
+            <Link href={ROUTES.EXPLORE} className="shrink-0 transition-colors hover:text-primary">Restaurants</Link>
+            <span className="shrink-0">/</span>
+            <span className="min-w-0 truncate text-text-primary">{restaurant.name}</span>
+          </nav>
+
           <h1 className="font-display text-2xl font-bold text-heading sm:text-3xl">{restaurant.name}</h1>
           <p className="mt-1 text-sm text-text-secondary">
             {restaurant.cuisines.join(' · ')}
@@ -125,13 +135,11 @@ export default async function RestaurantPage({ params }: PageProps) {
 
           {dishes.length > 0 && (
             <div className="mt-6 flex gap-3">
-              <Link
-                href={`${ROUTES.WRITE_REVIEW}?dishId=${dishes[0].id}&restaurantId=${restaurant.id}&dishName=${encodeURIComponent(dishes[0].name)}&restaurantName=${encodeURIComponent(restaurant.name)}`}
-                className="inline-flex items-center gap-2 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary-dark hover:-translate-y-0.5 hover:shadow-glow"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
-                Review a Dish
-              </Link>
+              <ReviewDishPicker
+                dishes={dishes}
+                restaurantId={restaurant.id}
+                restaurantName={restaurant.name}
+              />
             </div>
           )}
 
@@ -148,10 +156,10 @@ export default async function RestaurantPage({ params }: PageProps) {
             ))}
           </div>
 
-          {/* Dishes */}
+          {/* Menu */}
           <div className="mt-8 pb-12 sm:mt-10">
             <h2 className="font-display text-lg font-bold text-heading sm:text-xl">
-              Popular Dishes
+              Menu ({dishes.length} dish{dishes.length !== 1 ? 'es' : ''})
             </h2>
             {dishes.length === 0 ? (
               <EmptyState
@@ -160,10 +168,8 @@ export default async function RestaurantPage({ params }: PageProps) {
                 description="Be the first to add a dish review for this restaurant."
               />
             ) : (
-              <div className="mt-4 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-                {dishes.map((dish, i) => (
-                  <DishCard key={dish.id} dish={dish} index={i} />
-                ))}
+              <div className="mt-4 sm:mt-6">
+                <RestaurantMenu dishes={dishes} />
               </div>
             )}
           </div>

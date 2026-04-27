@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select'
 import { UserAvatar } from '@/components/ui/Avatar'
 import { CITY_AREAS, SUPPORTED_CITIES, type City } from '@/lib/constants'
+import { MobileBackButton } from '@/components/ui/MobileBackButton'
 import { useCityContext } from '@/lib/context/CityContext'
 
 export default function SettingsPage() {
@@ -96,6 +97,7 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
+      <MobileBackButton />
       <h1 className="font-display text-2xl font-bold text-heading">Settings</h1>
       <p className="mt-1 text-sm text-text-secondary">Update your profile information</p>
 

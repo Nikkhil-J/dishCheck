@@ -20,6 +20,7 @@ import { ROUTES } from '@/lib/constants/routes'
 import { API_ENDPOINTS } from '@/lib/constants/api'
 import { CLIENT_ERRORS } from '@/lib/constants/errors'
 import { HTTP_HEADERS } from '@/lib/constants'
+import { MobileBackButton } from '@/components/ui/MobileBackButton'
 
 export default function ClaimRestaurantPage() {
   const params = useParams<{ id: string }>()
@@ -119,6 +120,7 @@ export default function ClaimRestaurantPage() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
+      <MobileBackButton />
       <h1 className="font-display text-2xl font-bold text-heading">Claim this restaurant</h1>
       <p className="mt-1 text-sm text-text-secondary">
         Verify your ownership of <strong>{restaurant.name}</strong> to access the analytics dashboard.

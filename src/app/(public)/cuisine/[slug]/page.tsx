@@ -4,6 +4,7 @@ import { searchDishes } from '@/lib/services/dishes'
 import { DishCard } from '@/components/features/DishCard'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { CUISINE_TYPES, CUISINE_EMOJI, SORT_OPTIONS } from '@/lib/constants'
+import { MobileBackButton } from '@/components/ui/MobileBackButton'
 import { ROUTES } from '@/lib/constants/routes'
 
 export const revalidate = 3600
@@ -49,6 +50,7 @@ export default async function CuisinePage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 py-6 sm:px-6 sm:py-8">
+      <MobileBackButton />
       {/* Hero */}
       <div className="py-6 text-center sm:py-10">
         <div className="text-4xl sm:text-5xl">{emoji}</div>

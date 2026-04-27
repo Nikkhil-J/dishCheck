@@ -98,7 +98,8 @@ function CitySelector() {
 export function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
-  const showSearch = pathname !== ROUTES.HOME
+  const showSearchInNavbar = pathname !== ROUTES.HOME && !pathname.startsWith('/restaurant/')
+  const showMobileSearchIcon = showSearchInNavbar && !pathname.startsWith('/explore')
   const [scrolled, setScrolled] = useState(false)
   const { user, isAuthenticated, isLoading } = useAuth()
 
@@ -122,7 +123,7 @@ export function Navbar() {
 
         <div className="mx-auto hidden min-w-0 flex-1 md:block">
           <AnimatePresence>
-            {showSearch && (
+            {showSearchInNavbar && (
               <motion.div
                 key="navbar-search"
                 initial={{ opacity: 0, y: -8 }}
@@ -142,12 +143,12 @@ export function Navbar() {
         <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2.5">
           <CitySelector />
 
-          {showSearch && (
+          {showMobileSearchIcon && (
             <Button
               variant="ghost"
               size="icon"
               className="rounded-full md:hidden"
-              onClick={() => router.push(ROUTES.EXPLORE)}
+              onClick={() => router.push(`${ROUTES.EXPLORE}?focus=1`)}
               aria-label="Search"
             >
               <Search className="h-5 w-5 text-text-secondary" />

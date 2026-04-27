@@ -3,8 +3,6 @@ import type { ReviewFormData } from '@/lib/types'
 
 interface ReviewFormState {
   data: ReviewFormData
-  currentStep: 1 | 2 | 3
-  setStep: (s: 1 | 2 | 3) => void
   updateField: <K extends keyof ReviewFormData>(key: K, value: ReviewFormData[K]) => void
   reset: () => void
 }
@@ -14,6 +12,8 @@ const defaultData: ReviewFormData = {
   restaurantId: '',
   photoFile: null,
   photoPreviewUrl: null,
+  billFile: null,
+  billPreviewUrl: null,
   tasteRating: null,
   portionRating: null,
   valueRating: null,
@@ -23,9 +23,7 @@ const defaultData: ReviewFormData = {
 
 export const useReviewFormStore = create<ReviewFormState>((set) => ({
   data: defaultData,
-  currentStep: 1,
-  setStep: (currentStep) => set({ currentStep }),
   updateField: (key, value) =>
     set((s) => ({ data: { ...s.data, [key]: value } })),
-  reset: () => set({ data: defaultData, currentStep: 1 }),
+  reset: () => set({ data: defaultData }),
 }))

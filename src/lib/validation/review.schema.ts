@@ -12,6 +12,7 @@ export const createReviewSchema = z.object({
   tags: z.array(z.enum(TAG_LIST)).default([]),
   text: z.string().min(30, 'Review must be at least 30 characters'),
   photoUrl: z.string().min(1).optional(),
+  billUrl: z.string().min(1).optional(),
 }).strip()
 
 export type CreateReviewInput = z.infer<typeof createReviewSchema>

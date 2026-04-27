@@ -10,22 +10,21 @@ interface StatDef {
 }
 
 interface StatsBarProps {
-  dishCount: number
+  restaurantCount: number
+  reviewCount: number
   cityCount: number
 }
 
-export function StatsBar({ dishCount, cityCount }: StatsBarProps) {
+export function StatsBar({ restaurantCount, reviewCount, cityCount }: StatsBarProps) {
   const stats: StatDef[] = [
-    { value: `${dishCount}`, suffix: '+', label: 'Dishes Listed', sub: 'across all menus' },
-    { value: '4.8', suffix: '★', label: 'Avg. Rating', sub: 'from real diners' },
-    { value: '2', label: 'Restaurants', badge: 'Growing fast' },
-    { value: `${cityCount}`, label: 'Cities', sub: 'Dublin · More soon' },
-    { value: '12', suffix: '+', label: 'New This Week', sub: 'fresh additions' },
+    { value: `${restaurantCount}`, suffix: '+', label: 'Restaurants', badge: 'Growing fast' },
+    { value: `${reviewCount}`, suffix: '+', label: 'Dish Reviews', sub: 'from real diners' },
+    { value: `${cityCount}`, label: 'Cities', sub: 'and counting' },
   ]
 
   return (
     <div className="py-4 sm:px-12 sm:py-8">
-      <div className="grid grid-cols-2 gap-4 sm:flex sm:items-center sm:justify-evenly sm:gap-0">
+      <div className="grid grid-cols-3 gap-4 sm:flex sm:items-center sm:justify-evenly sm:gap-0">
         {stats.map((stat, i) => (
           <Fragment key={stat.label}>
             {i > 0 && (
@@ -40,7 +39,6 @@ export function StatsBar({ dishCount, cityCount }: StatsBarProps) {
             <div
               className={cn(
                 'flex flex-col items-center justify-center text-center sm:flex-1',
-                i === stats.length - 1 && stats.length % 2 !== 0 && 'col-span-2 sm:col-span-1'
               )}
             >
               <p className="font-display text-2xl font-bold tracking-tight text-primary sm:text-[48px]">

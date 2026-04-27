@@ -39,6 +39,40 @@ export async function uploadDishPhoto(file: File, dishId: string): Promise<strin
   }
 }
 
+export async function uploadBillPhoto(file: File, dishId: string): Promise<string> {
+  if (!CLOUD_NAME) {
+    throw new Error('Missing env var: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME')
+  }
+  if (!UPLOAD_PRESET) {
+    throw new Error('Missing env var: NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET')
+  }
+
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', UPLOAD_PRESET)
+  formData.append('folder', `cravia/bills/${dishId}`)
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS)
+
+  try {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal,
+    })
+
+    if (!res.ok) {
+      throw new Error(`Cloudinary upload failed: ${res.statusText}`)
+    }
+
+    const data = await res.json() as { secure_url: string }
+    return data.secure_url
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
 export async function uploadAvatarPhoto(
   file: File,
   userId: string

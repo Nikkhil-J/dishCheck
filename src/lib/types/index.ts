@@ -91,12 +91,14 @@ export interface Review {
   userName: string
   userLevel: UserLevel
   userAvatarUrl: string | null
-  photoUrl: string
+  photoUrl: string | null
   tasteRating: number
   portionRating: number
   valueRating: number
   tags: string[]
   text: string | null
+  billUrl: string | null
+  isVerified: boolean
   helpfulVotes: number
   helpfulVotedBy: string[]
   isFlagged: boolean
@@ -175,6 +177,8 @@ export interface ReviewFormData {
   restaurantId: string
   photoFile: File | null
   photoPreviewUrl: string | null
+  billFile: File | null
+  billPreviewUrl: string | null
   tasteRating: number | null
   portionRating: number | null
   valueRating: number | null

@@ -1,5 +1,5 @@
 /**
- * Syncs all Firestore dishes to Typesense for full-text search.
+ * Syncs all Firestore dishes AND restaurants to Typesense for full-text search.
  *
  * Usage:
  *   npx tsx scripts/sync-typesense.ts
@@ -64,6 +64,34 @@ const DISHES_SCHEMA: CollectionCreateSchema = {
   default_sorting_field: 'avgOverall',
 }
 
+const RESTAURANTS_SCHEMA: CollectionCreateSchema = {
+  name: 'restaurants',
+  fields: [
+    { name: 'name', type: 'string' as const },
+    { name: 'nameLower', type: 'string' as const },
+    { name: 'city', type: 'string' as const, facet: true },
+    { name: 'area', type: 'string' as const, facet: true },
+    { name: 'cuisines', type: 'string[]' as const, facet: true },
+    { name: 'coverImage', type: 'string' as const, optional: true },
+    { name: 'dishNames', type: 'string[]' as const },
+    { name: 'dishCount', type: 'int32' as const },
+    { name: 'totalReviews', type: 'int32' as const },
+    { name: 'isActive', type: 'bool' as const, facet: true },
+    { name: 'createdAt', type: 'int64' as const },
+  ],
+  default_sorting_field: 'totalReviews',
+}
+
+interface RestaurantDoc {
+  name?: string
+  city?: string
+  area?: string
+  cuisines?: string[]
+  coverImage?: string | null
+  isActive?: boolean
+  createdAt?: { toDate?: () => Date } | string | null
+}
+
 interface DishDoc {
   name?: string
   nameLower?: string
@@ -119,6 +147,90 @@ function dishToTypesense(id: string, d: DishDoc) {
     topTags: d.topTags ?? [],
     isActive: d.isActive ?? true,
     createdAt: toEpoch(d.createdAt),
+  }
+}
+
+function restaurantToTypesense(
+  id: string,
+  r: RestaurantDoc,
+  dishNames: string[],
+  dishCount: number,
+  totalReviews: number,
+) {
+  return {
+    id,
+    name: r.name ?? '',
+    nameLower: (r.name ?? '').toLowerCase(),
+    city: r.city ?? '',
+    area: r.area ?? '',
+    cuisines: r.cuisines ?? [],
+    coverImage: r.coverImage ?? '',
+    dishNames,
+    dishCount,
+    totalReviews,
+    isActive: r.isActive ?? true,
+    createdAt: toEpoch(r.createdAt),
+  }
+}
+
+async function syncRestaurants(client: Client) {
+  console.log('\n--- Restaurants ---')
+
+  const restSnap = await adminDb.collection('restaurants').get()
+  console.log(`  Found ${restSnap.size} restaurants in Firestore`)
+
+  if (dryRun) {
+    for (const doc of restSnap.docs) {
+      const r = doc.data() as RestaurantDoc
+      console.log(`  [DRY RUN] Would sync restaurant: ${doc.id} — ${r.name}`)
+    }
+    console.log(`\n[DRY RUN] Would upsert ${restSnap.size} restaurants`)
+    return
+  }
+
+  try {
+    await client.collections('restaurants').delete()
+    console.log('  Dropped existing restaurants collection')
+  } catch {
+    console.log('  No existing restaurants collection to drop')
+  }
+
+  await client.collections().create(RESTAURANTS_SCHEMA)
+  console.log('  Created restaurants collection with schema')
+
+  const documents = await Promise.all(
+    restSnap.docs.map(async (doc) => {
+      const r = doc.data() as RestaurantDoc
+      const dishSnap = await adminDb
+        .collection('dishes')
+        .where('restaurantId', '==', doc.id)
+        .where('isActive', '==', true)
+        .get()
+
+      const dishNames: string[] = []
+      let totalReviews = 0
+      for (const d of dishSnap.docs) {
+        const data = d.data() as DishDoc
+        if (data.name) dishNames.push(data.name)
+        totalReviews += data.reviewCount ?? 0
+      }
+
+      return restaurantToTypesense(doc.id, r, dishNames, dishSnap.size, totalReviews)
+    })
+  )
+
+  const results = await client
+    .collections('restaurants')
+    .documents()
+    .import(documents, { action: 'upsert' })
+
+  const failed = results.filter((r) => !r.success)
+  console.log(`\n  Upserted: ${results.length - failed.length}`)
+  if (failed.length > 0) {
+    console.error(`  Failed: ${failed.length}`)
+    for (const f of failed.slice(0, 5)) {
+      console.error(`    ${JSON.stringify(f)}`)
+    }
   }
 }
 
@@ -183,7 +295,9 @@ async function main() {
     }
   }
 
-  console.log('Done!')
+  await syncRestaurants(client)
+
+  console.log('\nDone!')
   process.exit(0)
 }
 

@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { getDish } from '@/lib/services/dishes'
 import { getReview } from '@/lib/services/reviews'
 import { ReviewCardV2 } from '@/components/features/ReviewCardV2'
+import { MobileBackButton } from '@/components/ui/MobileBackButton'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -27,6 +28,7 @@ export default async function ReviewPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
+      <MobileBackButton />
       {dish && (
         <div className="mb-6">
           <h1 className="font-display text-2xl font-bold text-heading">{dish.name}</h1>

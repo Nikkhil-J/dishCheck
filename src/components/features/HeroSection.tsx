@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 import { HeroSearchBar } from '@/components/features/HeroSearchBar'
 import { ROUTES } from '@/lib/constants/routes'
 
-const HERO_TAGS = ['Sushi', 'Pizza', 'Wings', 'Ramen', 'Biryani', 'Dimsum']
+const HERO_TAGS = ['Biryani', 'Pizza', 'Sushi', 'Ramen', 'Dosa', 'Burger']
 
 export function HeroSection() {
   const [heroExiting, setHeroExiting] = useState(false)
@@ -25,13 +25,13 @@ export function HeroSection() {
         transition={{ duration: 0.25, ease: 'easeIn' }}
       >
         <h1 className="font-display text-3xl font-bold tracking-tight text-heading sm:text-5xl lg:text-6xl">
-          Find your next{' '}
+          Find the best dishes at{' '}
           <span className="bg-gradient-to-r from-primary to-brand-orange bg-clip-text text-transparent">
-            favourite dish
+            restaurants near you
           </span>
         </h1>
         <p className="mx-auto mt-3 max-w-lg text-base text-text-secondary sm:mt-5 sm:text-lg">
-          Honest reviews from real food lovers. Discover amazing dishes — not just restaurants.
+          Search restaurants by name, cuisine, or a dish you love. Read honest dish-level reviews from real food lovers.
         </p>
       </motion.div>
 

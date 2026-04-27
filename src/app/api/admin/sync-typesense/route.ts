@@ -37,6 +37,30 @@ function mapDishDoc(doc: QueryDocumentSnapshot) {
   }
 }
 
+function mapRestaurantDoc(
+  doc: QueryDocumentSnapshot,
+  dishNames: string[],
+  dishCount: number,
+  totalReviews: number,
+) {
+  const r = doc.data()
+  const createdAt = r.createdAt?.toDate?.()
+  return {
+    id: doc.id,
+    name:        (r.name       as string)   ?? '',
+    nameLower:   ((r.name as string) ?? '').toLowerCase(),
+    city:        (r.city       as string)   ?? '',
+    area:        (r.area       as string)   ?? '',
+    cuisines:    (r.cuisines   as string[]) ?? [],
+    coverImage:  (r.coverImage as string)   ?? '',
+    dishNames,
+    dishCount,
+    totalReviews,
+    isActive:    (r.isActive   as boolean)  ?? true,
+    createdAt:   createdAt ? Math.floor(createdAt.getTime() / 1000) : 0,
+  }
+}
+
 export async function POST(req: Request) {
   try {
     await assertAdmin(req)
@@ -53,25 +77,25 @@ export async function POST(req: Request) {
 
   try {
     const client = getTypesenseClient()
-    let synced = 0
-    let failed = 0
-    let total  = 0
-    let lastDoc: QueryDocumentSnapshot | undefined
 
-    // Paginate through the dishes collection in batches to avoid loading
-    // the entire collection into memory at once.
+    // --- Sync dishes ---
+    let dishesSynced = 0
+    let dishesFailed = 0
+    let dishesTotal  = 0
+    let lastDishDoc: QueryDocumentSnapshot | undefined
+
     while (true) {
       let q = adminDb
         .collection(COLLECTIONS.DISHES)
         .orderBy('__name__')
         .limit(BATCH_SIZE)
 
-      if (lastDoc) q = q.startAfter(lastDoc) as typeof q
+      if (lastDishDoc) q = q.startAfter(lastDishDoc) as typeof q
 
       const snap = await q.get()
       if (snap.empty) break
 
-      total += snap.size
+      dishesTotal += snap.size
       const documents = snap.docs.map(mapDishDoc)
 
       const results = await client
@@ -80,14 +104,69 @@ export async function POST(req: Request) {
         .import(documents, { action: 'upsert' })
 
       const batchFailed = results.filter((r: { success: boolean }) => !r.success)
-      synced += results.length - batchFailed.length
-      failed += batchFailed.length
+      dishesSynced += results.length - batchFailed.length
+      dishesFailed += batchFailed.length
 
       if (snap.size < BATCH_SIZE) break
-      lastDoc = snap.docs[snap.docs.length - 1]
+      lastDishDoc = snap.docs[snap.docs.length - 1]
     }
 
-    return NextResponse.json({ synced, failed, total })
+    // --- Sync restaurants ---
+    let restaurantsSynced = 0
+    let restaurantsFailed = 0
+    let restaurantsTotal  = 0
+    let lastRestDoc: QueryDocumentSnapshot | undefined
+
+    while (true) {
+      let q = adminDb
+        .collection(COLLECTIONS.RESTAURANTS)
+        .orderBy('__name__')
+        .limit(BATCH_SIZE)
+
+      if (lastRestDoc) q = q.startAfter(lastRestDoc) as typeof q
+
+      const snap = await q.get()
+      if (snap.empty) break
+
+      restaurantsTotal += snap.size
+
+      const documents = await Promise.all(
+        snap.docs.map(async (restDoc) => {
+          const dishSnap = await adminDb
+            .collection(COLLECTIONS.DISHES)
+            .where('restaurantId', '==', restDoc.id)
+            .where('isActive', '==', true)
+            .get()
+
+          const dishNames: string[] = []
+          let totalReviews = 0
+          for (const d of dishSnap.docs) {
+            const data = d.data()
+            if (data.name) dishNames.push(data.name as string)
+            totalReviews += (data.reviewCount as number) ?? 0
+          }
+
+          return mapRestaurantDoc(restDoc, dishNames, dishSnap.size, totalReviews)
+        })
+      )
+
+      const results = await client
+        .collections('restaurants')
+        .documents()
+        .import(documents, { action: 'upsert' })
+
+      const batchFailed = results.filter((r: { success: boolean }) => !r.success)
+      restaurantsSynced += results.length - batchFailed.length
+      restaurantsFailed += batchFailed.length
+
+      if (snap.size < BATCH_SIZE) break
+      lastRestDoc = snap.docs[snap.docs.length - 1]
+    }
+
+    return NextResponse.json({
+      dishes: { synced: dishesSynced, failed: dishesFailed, total: dishesTotal },
+      restaurants: { synced: restaurantsSynced, failed: restaurantsFailed, total: restaurantsTotal },
+    })
   } catch (e) {
     captureError(e, { route: '/api/admin/sync-typesense' })
     const message = e instanceof Error ? e.message : 'Sync failed'

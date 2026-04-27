@@ -1,4 +1,5 @@
 export const API_ENDPOINTS = {
+  RESTAURANTS: '/api/restaurants',
   REVIEWS: '/api/reviews',
   review: (id: string) => `/api/reviews/${id}`,
   reviewHelpful: (id: string) => `/api/reviews/${id}/helpful`,

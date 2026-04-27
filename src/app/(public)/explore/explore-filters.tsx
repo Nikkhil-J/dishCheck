@@ -5,11 +5,10 @@ import { SlidersHorizontal, X } from 'lucide-react'
 import { useCallback, useRef, useState, useLayoutEffect, Suspense, type ReactNode } from 'react'
 import { motion } from 'motion/react'
 import { cn } from '@/lib/utils'
-import type { DietaryType, PriceRange } from '@/lib/types'
+import type { RestaurantSortOption } from '@/lib/services/catalog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ROUTES } from '@/lib/constants/routes'
-import { SORT_OPTIONS as SORT_OPTION_VALUES } from '@/lib/constants'
 import {
   Sheet,
   SheetTrigger,
@@ -25,37 +24,19 @@ import {
   SelectItem,
 } from '@/components/ui/select'
 
-type SortOption = 'highest-rated' | 'newest' | 'most-helpful'
-
 interface ExploreFiltersProps {
   query: string
   selectedCuisine: string | null
   selectedArea: string | null
-  selectedDietary: DietaryType | null
-  selectedPriceRange: PriceRange | null
-  selectedSortBy: SortOption
+  selectedSortBy: RestaurantSortOption
   cuisines: string[]
   areas: string[]
 }
 
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: SORT_OPTION_VALUES.HIGHEST_RATED, label: 'Highest Rated' },
-  { value: SORT_OPTION_VALUES.NEWEST, label: 'Newest' },
-  { value: SORT_OPTION_VALUES.MOST_HELPFUL, label: 'Most Reviewed' },
-]
-
-const DIETARY_OPTIONS: { value: DietaryType; label: string; dotClass: string }[] = [
-  { value: 'veg', label: 'Veg', dotClass: 'bg-success' },
-  { value: 'non-veg', label: 'Non-veg', dotClass: 'bg-destructive' },
-  { value: 'egg', label: 'Egg', dotClass: 'bg-brand-gold' },
-]
-
-const PRICE_OPTIONS: { value: PriceRange; label: string }[] = [
-  { value: 'under-100', label: '< ₹100' },
-  { value: '100-200', label: '₹100–200' },
-  { value: '200-400', label: '₹200–400' },
-  { value: '400-600', label: '₹400–600' },
-  { value: 'above-600', label: '> ₹600' },
+const SORT_OPTIONS: { value: RestaurantSortOption; label: string }[] = [
+  { value: 'most-reviewed', label: 'Most Reviewed' },
+  { value: 'newest', label: 'Newest' },
+  { value: 'alphabetical', label: 'A–Z' },
 ]
 
 const scrollRowClass =
@@ -109,14 +90,14 @@ function SortSegmented({
   value,
   onChange,
 }: {
-  value: SortOption
-  onChange: (v: SortOption) => void
+  value: RestaurantSortOption
+  onChange: (v: RestaurantSortOption) => void
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const itemRefs = useRef<Map<SortOption, HTMLButtonElement>>(new Map())
+  const itemRefs = useRef<Map<RestaurantSortOption, HTMLButtonElement>>(new Map())
   const [pill, setPill] = useState<{ left: number; width: number } | null>(null)
 
-  function measure(active: SortOption) {
+  function measure(active: RestaurantSortOption) {
     const container = containerRef.current
     const el = itemRefs.current.get(active)
     if (!container || !el) return
@@ -162,8 +143,6 @@ function SortSegmented({
 function FiltersInner({
   selectedCuisine: serverCuisine,
   selectedArea: serverArea,
-  selectedDietary: serverDietary,
-  selectedPriceRange: serverPriceRange,
   selectedSortBy: serverSortBy,
   cuisines,
   areas,
@@ -173,27 +152,21 @@ function FiltersInner({
 
   const [optimisticCuisine, setOptimisticCuisine] = useState<string | null>(null)
   const [optimisticArea, setOptimisticArea] = useState<string | null>(null)
-  const [optimisticDietary, setOptimisticDietary] = useState<DietaryType | null>(null)
-  const [optimisticPriceRange, setOptimisticPriceRange] = useState<PriceRange | null>(null)
-  const [optimisticSort, setOptimisticSort] = useState<SortOption | null>(null)
+  const [optimisticSort, setOptimisticSort] = useState<RestaurantSortOption | null>(null)
 
   const selectedCuisine = optimisticCuisine ?? serverCuisine
   const selectedArea = optimisticArea ?? serverArea
-  const selectedDietary = optimisticDietary ?? serverDietary
-  const selectedPriceRange = optimisticPriceRange ?? serverPriceRange
   const selectedSortBy = optimisticSort ?? serverSortBy
 
   const [lastServerKey, setLastServerKey] = useState(
-    `${serverCuisine}-${serverArea}-${serverDietary}-${serverPriceRange}-${serverSortBy}`
+    `${serverCuisine}-${serverArea}-${serverSortBy}`
   )
   const currentServerKey =
-    `${serverCuisine}-${serverArea}-${serverDietary}-${serverPriceRange}-${serverSortBy}`
+    `${serverCuisine}-${serverArea}-${serverSortBy}`
   if (currentServerKey !== lastServerKey) {
     setLastServerKey(currentServerKey)
     setOptimisticCuisine(null)
     setOptimisticArea(null)
-    setOptimisticDietary(null)
-    setOptimisticPriceRange(null)
     setOptimisticSort(null)
   }
 
@@ -216,48 +189,25 @@ function FiltersInner({
 
     if (key === 'cuisine') setOptimisticCuisine(newVal)
     else if (key === 'area') setOptimisticArea(newVal)
-    else if (key === 'dietary') setOptimisticDietary(newVal as DietaryType | null)
-    else if (key === 'priceRange') setOptimisticPriceRange(newVal as PriceRange | null)
 
     signalFilterChange()
     router.push(buildUrl({ [key]: newVal }))
   }
 
-  function handleSort(value: SortOption) {
+  function handleSort(value: RestaurantSortOption) {
     setOptimisticSort(value)
     signalFilterChange()
-    router.push(buildUrl({ sortBy: value === SORT_OPTION_VALUES.HIGHEST_RATED ? null : value }))
+    router.push(buildUrl({ sortBy: value === 'most-reviewed' ? null : value }))
   }
 
   const filterCount = [
     selectedCuisine,
     selectedArea,
-    selectedDietary,
-    selectedPriceRange,
   ].filter(Boolean).length
 
   const cuisineChips = cuisines.map((c) => (
     <FilterChip key={c} group="cuisine" active={selectedCuisine === c} onClick={() => toggleFilter('cuisine', c)}>
       {c}
-    </FilterChip>
-  ))
-
-  const dietaryChips = DIETARY_OPTIONS.map((opt) => (
-    <FilterChip
-      key={opt.value}
-      group="dietary"
-      active={selectedDietary === opt.value}
-      onClick={() => toggleFilter('dietary', opt.value)}
-      className="gap-2"
-    >
-      <span className={cn('h-2 w-2 shrink-0 rounded-full', opt.dotClass)} aria-hidden />
-      {opt.label}
-    </FilterChip>
-  ))
-
-  const priceChips = PRICE_OPTIONS.map((opt) => (
-    <FilterChip key={opt.value} group="price" active={selectedPriceRange === opt.value} onClick={() => toggleFilter('priceRange', opt.value)}>
-      {opt.label}
     </FilterChip>
   ))
 
@@ -286,31 +236,26 @@ function FiltersInner({
   const filterGroups = (
     <div className="space-y-5">
       <FilterSection label="Cuisine">{cuisineChips}</FilterSection>
-      <FilterSection label="Diet">{dietaryChips}</FilterSection>
-      <FilterSection label="Price">{priceChips}</FilterSection>
       {areas.length > 0 && <FilterSection label="Area">{areaChips}</FilterSection>}
     </div>
   )
 
   const sortSelectMobile = (
-    <div className="flex w-full items-center gap-3 md:hidden">
-      <span className="shrink-0 text-xs font-medium text-text-muted">Sort</span>
-      <Select
-        value={selectedSortBy}
-        onValueChange={(val) => handleSort(val as SortOption)}
-      >
-        <SelectTrigger className="h-9 min-w-0 flex-1 rounded-xl border-2">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {SORT_OPTIONS.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={selectedSortBy}
+      onValueChange={(val) => handleSort(val as RestaurantSortOption)}
+    >
+      <SelectTrigger className="h-auto min-w-0 flex-1 rounded-pill border-2 border-border bg-card px-3.5 py-2.5 text-sm font-semibold text-text-primary">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {SORT_OPTIONS.map((opt) => (
+          <SelectItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 
   const summaryRow =
@@ -329,26 +274,6 @@ function FiltersInner({
             <X className="h-3 w-3 text-text-muted" aria-hidden />
           </Badge>
         )}
-        {selectedDietary && (
-          <Badge
-            variant="secondary"
-            className="cursor-pointer gap-1 capitalize"
-            render={<button type="button" onClick={() => toggleFilter('dietary', selectedDietary)} />}
-          >
-            {selectedDietary === 'non-veg' ? 'Non-veg' : selectedDietary}
-            <X className="h-3 w-3 text-text-muted" aria-hidden />
-          </Badge>
-        )}
-        {selectedPriceRange && (
-          <Badge
-            variant="secondary"
-            className="cursor-pointer gap-1"
-            render={<button type="button" onClick={() => toggleFilter('priceRange', selectedPriceRange)} />}
-          >
-            {PRICE_OPTIONS.find((p) => p.value === selectedPriceRange)?.label ?? selectedPriceRange}
-            <X className="h-3 w-3 text-text-muted" aria-hidden />
-          </Badge>
-        )}
         {selectedArea && (
           <Badge
             variant="secondary"
@@ -364,7 +289,7 @@ function FiltersInner({
           size="xs"
           onClick={() => {
             signalFilterChange()
-            router.push(buildUrl({ cuisine: null, dietary: null, priceRange: null, area: null }))
+            router.push(buildUrl({ cuisine: null, area: null }))
           }}
           className="text-xs font-semibold"
         >
@@ -375,7 +300,7 @@ function FiltersInner({
 
   return (
     <div>
-      {/* Mobile: filters sheet trigger */}
+      {/* Mobile: filters + sort inline row */}
       <div className="flex gap-2 md:hidden">
         <Sheet>
           <SheetTrigger
@@ -399,6 +324,7 @@ function FiltersInner({
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">{filterGroups}</div>
           </SheetContent>
         </Sheet>
+        {sortSelectMobile}
       </div>
 
       {summaryRow}
@@ -408,12 +334,11 @@ function FiltersInner({
         {filterGroups}
       </div>
 
-      {/* Sort toolbar */}
-      <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-surface-2 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-5">
-        <span className="hidden text-xs font-semibold uppercase tracking-wide text-text-muted md:block">
+      {/* Sort toolbar — desktop only */}
+      <div className="mt-4 hidden rounded-2xl border border-border bg-surface-2 px-5 py-3 md:flex md:items-center md:justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-text-muted">
           Sort by
         </span>
-        {sortSelectMobile}
         <SortSegmented value={selectedSortBy} onChange={handleSort} />
       </div>
     </div>

@@ -15,6 +15,7 @@ import { DIETARY_BADGE, PRICE_LABEL, CONFIG, SUB_RATING_LABELS } from '@/lib/con
 import { WishlistButton } from '@/components/features/WishlistButton'
 import { SkeletonCard } from '@/components/ui/SkeletonCard'
 import type { DishPhoto } from '@/lib/types'
+import { MobileBackButton } from '@/components/ui/MobileBackButton'
 import { ROUTES } from '@/lib/constants/routes'
 
 export const revalidate = 3600
@@ -50,7 +51,7 @@ export default async function DishPage({ params }: PageProps) {
     listDishReviews(dish.id),
   ])
   const dishPhotos: DishPhoto[] = reviewsForPhotos.items
-    .filter((r) => r.photoUrl)
+    .filter((r): r is typeof r & { photoUrl: string } => !!r.photoUrl)
     .map((r) => ({ url: r.photoUrl, createdAt: r.createdAt }))
   const dietaryInfo = dish.dietary ? DIETARY_BADGE[dish.dietary] : null
 
@@ -79,11 +80,12 @@ export default async function DishPage({ params }: PageProps) {
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
     <div className="mx-auto max-w-[1200px] overflow-hidden px-4 py-8 sm:px-6">
+      <MobileBackButton />
       {/* Breadcrumb */}
       <nav className="mb-4 flex min-w-0 items-center gap-1.5 text-xs text-text-muted sm:mb-6 sm:gap-2 sm:text-sm">
-        <Link href={ROUTES.HOME} className="shrink-0 transition-colors hover:text-primary">Home</Link>
+        <Link href={ROUTES.EXPLORE} className="shrink-0 transition-colors hover:text-primary">Restaurants</Link>
         <span className="shrink-0">/</span>
-        <Link href={ROUTES.EXPLORE} className="shrink-0 transition-colors hover:text-primary">Explore</Link>
+        <Link href={ROUTES.restaurant(dish.restaurantId)} className="min-w-0 shrink truncate transition-colors hover:text-primary">{dish.restaurantName}</Link>
         <span className="shrink-0">/</span>
         <span className="min-w-0 truncate text-text-primary">{dish.name}</span>
       </nav>

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cravia — Write Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #E23744; --color-primary-dark: #C62D39;
+      --color-secondary: #FF6B35; --color-accent: #FFB800;
+      --color-accent-light: #FFF0C2; --color-success: #48C479;
+      --color-bg: #FFFFFF; --color-bg-warm: #FFF8F0;
+      --color-bg-cream: #FFFAF5; --color-bg-dark: #1C1C2B;
+      --color-text: #2D2D3A; --color-text-secondary: #6B7280;
+      --color-text-muted: #9CA3AF; --color-border: #F0F0F0;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 24px; --radius-pill: 999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+      --shadow-glow: 0 4px 20px rgba(226,55,68,0.25);
+      --font-display: 'Fredoka', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); color: var(--color-text); background: #F7F7F8; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; cursor: pointer; font-family: inherit; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease-smooth), transform 0.6s var(--ease-smooth); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Navbar */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .navbar-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+    .nav-back { width: 40px; height: 40px; border-radius: 50%; background: var(--color-bg-cream); display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); transition: all 0.2s; }
+    .nav-back:hover { background: var(--color-primary); color: white; }
+    .nav-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--color-bg-dark); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; border-radius: var(--radius-pill); padding: 10px 24px; transition: all 0.25s var(--ease-smooth); white-space: nowrap; }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-ghost { background: transparent; color: var(--color-text-secondary); padding: 8px 16px; }
+    .btn-ghost:hover { color: var(--color-primary); }
+
+    /* Hero */
+    .hero { padding: 88px 0 0; }
+    .hero-card { background: white; border-radius: var(--radius-xl); border: 1px solid var(--color-border); padding: 28px 32px; display: flex; align-items: center; gap: 20px; }
+    .hero-img { width: 72px; height: 72px; border-radius: var(--radius-lg); background: linear-gradient(135deg, #FECDD3, #FDA4AF); flex-shrink: 0; }
+    .hero-info { flex: 1; }
+    .hero-dish { font-family: var(--font-display); font-size: clamp(22px, 3vw, 28px); font-weight: 700; color: var(--color-bg-dark); line-height: 1.2; }
+    .hero-restaurant { font-size: 14px; color: var(--color-text-secondary); margin-top: 2px; }
+    .hero-restaurant a { color: var(--color-primary); font-weight: 600; }
+    .hero-meta { display: flex; gap: 16px; margin-top: 8px; font-size: 13px; color: var(--color-text-muted); }
+
+    /* Content layout */
+    .content { padding: 28px 0 100px; }
+    .layout { display: grid; grid-template-columns: 1fr; gap: 28px; }
+    @media (min-width: 1024px) { .layout { grid-template-columns: 1fr 340px; } }
+
+    /* Sections */
+    .section { margin-bottom: 8px; }
+    .section-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-text-muted); margin-bottom: 14px; }
+    .section-num { width: 22px; height: 22px; border-radius: 50%; background: var(--color-bg-dark); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0; transition: background 0.3s; }
+    .section-num.done { background: var(--color-success); }
+    .section-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--color-bg-dark); margin-bottom: 6px; }
+    .section-desc { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; }
+
+    /* Rating rows */
+    .rating-row { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: white; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: 10px; transition: all 0.3s; }
+    .rating-row:last-of-type { margin-bottom: 0; }
+    .rating-row.rated { border-color: rgba(255,184,0,0.3); background: var(--color-bg-cream); }
+    .rating-icon { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--color-bg-warm); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; transition: transform 0.3s var(--ease-bounce); }
+    .rating-row.rated .rating-icon { transform: scale(1.1); }
+    .rating-info { flex: 1; min-width: 0; }
+    .rating-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--color-bg-dark); }
+    .rating-hint { font-size: 12px; color: var(--color-text-muted); }
+    .rating-row.rated .rating-hint { color: var(--color-accent); font-weight: 600; }
+    .stars { display: flex; gap: 4px; flex-shrink: 0; }
+    .star { width: 40px; height: 40px; border-radius: var(--radius-sm); background: white; border: 1.5px solid var(--color-border); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; color: var(--color-border); transition: all 0.15s var(--ease-bounce); user-select: none; -webkit-tap-highlight-color: transparent; }
+    .star.filled { background: var(--color-accent-light); border-color: var(--color-accent); color: var(--color-accent); transform: scale(1.1); }
+    .star:hover { border-color: var(--color-accent); }
+    @media (max-width: 600px) {
+      .rating-row { flex-wrap: wrap; gap: 10px; }
+      .stars { width: 100%; justify-content: flex-start; }
+    }
+
+    /* Tags */
+    .tag-group { margin-bottom: 18px; }
+    .tag-group:last-child { margin-bottom: 0; }
+    .tag-group-name { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 10px; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { padding: 9px 18px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; border: 1.5px solid var(--color-border); background: white; color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; user-select: none; -webkit-tap-highlight-color: transparent; }
+    .tag:hover { border-color: var(--color-primary); color: var(--color-primary); background: rgba(226,55,68,0.03); }
+    .tag.selected { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+
+    /* Textarea */
+    .text-wrap { background: white; border: 2px solid var(--color-border); border-radius: var(--radius-xl); padding: 0; transition: border-color 0.2s; overflow: hidden; }
+    .text-wrap:focus-within { border-color: var(--color-primary); }
+    .review-textarea { width: 100%; min-height: 160px; border: none; padding: 20px 24px 10px; font-size: 15px; font-family: var(--font-body); resize: none; outline: none; line-height: 1.8; background: transparent; }
+    .review-textarea::placeholder { color: var(--color-text-muted); }
+    .text-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px 14px; }
+    .text-counter { font-size: 12px; font-weight: 600; color: var(--color-text-muted); transition: color 0.3s; }
+    .text-counter.met { color: var(--color-success); }
+    .text-help { font-size: 12px; color: var(--color-accent); }
+
+    /* Bill upload */
+    .verify-section { background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border-radius: var(--radius-xl); border: 1.5px solid #FDE68A; padding: 28px 32px; margin-top: 12px; }
+    .verify-header { display: flex; align-items: flex-start; gap: 14px; }
+    .verify-icon { width: 48px; height: 48px; border-radius: var(--radius-md); background: white; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+    .verify-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--color-bg-dark); }
+    .verify-desc { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; line-height: 1.6; }
+    .verify-badge-preview { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: var(--radius-pill); background: #059669; color: white; font-size: 11px; font-weight: 700; margin-left: 6px; vertical-align: middle; }
+    .verify-upload { margin-top: 18px; display: flex; gap: 12px; align-items: center; }
+    .verify-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-pill); background: white; border: 2px dashed #FCD34D; font-size: 14px; font-weight: 600; color: var(--color-text); cursor: pointer; transition: all 0.2s; }
+    .verify-btn:hover { border-color: var(--color-accent); background: var(--color-accent-light); }
+    .verify-btn.uploaded { border-style: solid; border-color: var(--color-success); background: #D1FAE5; color: #059669; }
+    .verify-optional { font-size: 12px; color: var(--color-text-muted); font-style: italic; }
+    .verify-benefit { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text-secondary); margin-top: 14px; }
+    .verify-benefit svg { flex-shrink: 0; color: var(--color-accent); }
+
+    /* Dish photo optional */
+    .photo-optional { margin-top: 12px; background: white; border: 1.5px solid var(--color-border); border-radius: var(--radius-xl); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+    .photo-opt-icon { font-size: 28px; flex-shrink: 0; }
+    .photo-opt-info { flex: 1; }
+    .photo-opt-title { font-weight: 600; font-size: 14px; color: var(--color-bg-dark); }
+    .photo-opt-hint { font-size: 12px; color: var(--color-text-muted); }
+    .photo-opt-btn { padding: 8px 18px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 600; border: 1.5px solid var(--color-border); background: white; color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+    .photo-opt-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .photo-opt-btn.added { border-color: var(--color-success); background: #D1FAE5; color: #059669; }
+
+    /* Sidebar */
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+    @media (min-width: 1024px) { .sidebar { position: sticky; top: 88px; align-self: start; } }
+    .sidebar-card { background: white; border-radius: var(--radius-xl); border: 1px solid var(--color-border); padding: 24px; }
+
+    /* Progress card */
+    .progress-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; margin-bottom: 16px; color: var(--color-bg-dark); }
+    .progress-ring-wrap { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+    .progress-ring { position: relative; width: 72px; height: 72px; flex-shrink: 0; }
+    .progress-ring svg { transform: rotate(-90deg); }
+    .progress-ring circle { fill: none; stroke-width: 6; stroke-linecap: round; }
+    .progress-ring .bg { stroke: var(--color-border); }
+    .progress-ring .fg { stroke: var(--color-primary); transition: stroke-dashoffset 0.6s var(--ease-smooth); }
+    .progress-ring .label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--color-bg-dark); }
+    .progress-text { font-size: 14px; color: var(--color-text-secondary); line-height: 1.5; }
+    .progress-text strong { color: var(--color-bg-dark); }
+    .checklist { display: flex; flex-direction: column; gap: 10px; }
+    .check-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--color-text-secondary); }
+    .check-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--color-border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.3s var(--ease-bounce); }
+    .check-dot.done { background: var(--color-success); border-color: var(--color-success); color: white; }
+    .check-item.done { color: var(--color-text); font-weight: 500; }
+    .check-item.done .check-name { text-decoration: line-through; opacity: 0.6; }
+
+    /* Preview card */
+    .preview-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; margin-bottom: 16px; color: var(--color-bg-dark); }
+    .preview-stars { display: flex; gap: 3px; color: var(--color-border); font-size: 18px; margin-bottom: 8px; }
+    .preview-stars .filled { color: var(--color-accent); }
+    .preview-subs { display: flex; gap: 12px; margin-bottom: 12px; font-size: 12px; color: var(--color-text-muted); }
+    .preview-subs .active { color: var(--color-text); font-weight: 600; }
+    .preview-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .preview-tag { padding: 3px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 500; background: var(--color-bg-cream); color: var(--color-text-secondary); }
+    .preview-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; font-style: italic; }
+    .preview-empty { font-size: 13px; color: var(--color-text-muted); text-align: center; padding: 20px 0; }
+    .preview-verified { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #059669; margin-top: 10px; }
+
+    /* Submit bar */
+    .submit-bar { background: white; border-radius: var(--radius-xl); border: 1px solid var(--color-border); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .submit-hint { font-size: 13px; color: var(--color-text-muted); }
+    .submit-hint strong { color: var(--color-success); }
+
+    @media (max-width: 767px) {
+      .hero-card { flex-direction: column; text-align: center; gap: 14px; padding: 24px 20px; }
+      .hero-meta { justify-content: center; }
+      .verify-section { padding: 20px; }
+      .verify-upload { flex-direction: column; align-items: stretch; }
+      .photo-optional { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <button class="nav-back" title="Go back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="nav-title">Write a Review</span>
+      </div>
+      <div class="nav-right">
+        <button class="btn btn-ghost">Cancel</button>
+        <button class="btn btn-primary" id="navSubmit" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          Submit
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero: Dish context -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-card reveal">
+        <div class="hero-img"></div>
+        <div class="hero-info">
+          <div class="hero-dish">Hyderabadi Dum Biryani</div>
+          <div class="hero-restaurant">at <a href="#">Paradise Biryani</a> &middot; Indiranagar, Bengaluru</div>
+          <div class="hero-meta">
+            <span>⭐ 4.8 (128 reviews)</span>
+            <span>💰 ₹350</span>
+            <span>🍽️ Biryani</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container">
+      <div class="layout">
+
+        <!-- Left: form sections -->
+        <div>
+
+          <!-- 1. Ratings -->
+          <div class="section reveal">
+            <div class="section-label"><span class="section-num" id="num-1">1</span> Rate</div>
+            <div class="section-title">How was this dish?</div>
+            <div class="section-desc">Tap the stars. Be honest — it helps everyone decide better.</div>
+
+            <div class="rating-row" id="row-taste">
+              <div class="rating-icon">😋</div>
+              <div class="rating-info">
+                <div class="rating-name">Taste</div>
+                <div class="rating-hint" id="hint-taste">How did it taste?</div>
+              </div>
+              <div class="stars" id="stars-taste"></div>
+            </div>
+            <div class="rating-row" id="row-portion">
+              <div class="rating-icon">📏</div>
+              <div class="rating-info">
+                <div class="rating-name">Portion</div>
+                <div class="rating-hint" id="hint-portion">Was the serving size fair?</div>
+              </div>
+              <div class="stars" id="stars-portion"></div>
+            </div>
+            <div class="rating-row" id="row-value">
+              <div class="rating-icon">💰</div>
+              <div class="rating-info">
+                <div class="rating-name">Value for Money</div>
+                <div class="rating-hint" id="hint-value">Worth the price?</div>
+              </div>
+              <div class="stars" id="stars-value"></div>
+            </div>
+          </div>
+
+          <!-- 2. Tags -->
+          <div class="section reveal">
+            <div class="section-label"><span class="section-num" id="num-2">2</span> Tag</div>
+            <div class="section-title">Describe it in a few words</div>
+            <div class="section-desc">Help others know what to expect. Pick at least one.</div>
+
+            <div class="tag-group">
+              <div class="tag-group-name">Flavour Profile</div>
+              <div class="tag-row" id="tags-flavour"></div>
+            </div>
+            <div class="tag-group">
+              <div class="tag-group-name">Portion & Sharing</div>
+              <div class="tag-row" id="tags-portion"></div>
+            </div>
+            <div class="tag-group">
+              <div class="tag-group-name">Value Assessment</div>
+              <div class="tag-row" id="tags-value"></div>
+            </div>
+            <div class="tag-group">
+              <div class="tag-group-name">Quality & Vibe</div>
+              <div class="tag-row" id="tags-quality"></div>
+            </div>
+          </div>
+
+          <!-- 3. Written review -->
+          <div class="section reveal">
+            <div class="section-label"><span class="section-num" id="num-3">3</span> Write</div>
+            <div class="section-title">Tell the story</div>
+            <div class="section-desc">What made this memorable? Would you order it again?</div>
+
+            <div class="text-wrap">
+              <textarea class="review-textarea" id="reviewText" placeholder="The biryani had perfectly layered rice with tender chicken pieces. The flavour was rich and the spice level was just right..." oninput="updateText()"></textarea>
+              <div class="text-footer">
+                <span class="text-counter" id="charCount">0 / 30 minimum</span>
+                <span class="text-help" id="charHelp"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Optional dish photo -->
+          <div class="photo-optional reveal" id="photoSection">
+            <div class="photo-opt-icon">📸</div>
+            <div class="photo-opt-info">
+              <div class="photo-opt-title">Got a photo of the dish?</div>
+              <div class="photo-opt-hint">Optional — but photos make reviews way more helpful</div>
+            </div>
+            <button class="photo-opt-btn" id="photoBtn" onclick="togglePhoto()">Add Photo</button>
+          </div>
+
+          <!-- Verify your visit -->
+          <div class="verify-section reveal">
+            <div class="verify-header">
+              <div class="verify-icon">🧾</div>
+              <div>
+                <div class="verify-title">
+                  Verify your visit
+                  <span class="verify-badge-preview">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                    Verified
+                  </span>
+                </div>
+                <div class="verify-desc">
+                  Upload your bill or receipt and your review gets a <strong>Verified</strong> badge.
+                  Verified reviews rank higher and earn more trust.
+                </div>
+              </div>
+            </div>
+            <div class="verify-upload">
+              <button class="verify-btn" id="billBtn" onclick="toggleBill()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                Upload Bill / Receipt
+              </button>
+              <span class="verify-optional">100% optional</span>
+            </div>
+            <div class="verify-benefit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Your bill is only used for verification — never shown publicly
+            </div>
+          </div>
+
+          <!-- Submit bar (mobile & desktop) -->
+          <div class="submit-bar reveal" style="margin-top: 20px;">
+            <div class="submit-hint" id="submitHint">Complete all required fields to submit</div>
+            <button class="btn btn-primary" id="mainSubmit" disabled style="padding: 14px 36px; font-size: 16px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              Submit Review
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right: sidebar -->
+        <aside class="sidebar">
+
+          <!-- Progress -->
+          <div class="sidebar-card reveal">
+            <div class="progress-title">Your progress</div>
+            <div class="progress-ring-wrap">
+              <div class="progress-ring">
+                <svg width="72" height="72" viewBox="0 0 72 72">
+                  <circle class="bg" cx="36" cy="36" r="30" />
+                  <circle class="fg" id="ringFg" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5" />
+                </svg>
+                <div class="label" id="ringLabel">0%</div>
+              </div>
+              <div class="progress-text" id="progressText">
+                Fill in the <strong>3 required sections</strong> to submit your review.
+              </div>
+            </div>
+            <div class="checklist">
+              <div class="check-item" id="check-ratings">
+                <div class="check-dot" id="dot-ratings"></div>
+                <span class="check-name">Rate all 3 categories</span>
+              </div>
+              <div class="check-item" id="check-tags">
+                <div class="check-dot" id="dot-tags"></div>
+                <span class="check-name">Pick at least 1 tag</span>
+              </div>
+              <div class="check-item" id="check-text">
+                <div class="check-dot" id="dot-text"></div>
+                <span class="check-name">Write 30+ characters</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live preview -->
+          <div class="sidebar-card reveal reveal-delay-1">
+            <div class="preview-title">Live preview</div>
+            <div id="previewContent">
+              <div class="preview-empty">Your review will appear here as you type...</div>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </section>
+
+<script>
+  const LABELS = { 0: '', 1: 'Poor', 2: 'Fair', 3: 'Good', 4: 'Great', 5: 'Amazing!' };
+  const TAGS = {
+    flavour: ['Spicy', 'Mild', 'Very Sweet', 'Savoury', 'Authentic', 'Bland'],
+    portion: ['Generous Portion', 'Small Portion', 'Good for Sharing', 'Solo Serving'],
+    value: ['Great Value', 'Fair Price', 'Overpriced'],
+    quality: ['Fresh Ingredients', 'Oily', 'Dry', 'Overcooked', 'Comfort Food', 'Must Try', 'Skip It'],
+  };
+
+  let S = { taste: 0, portion: 0, value: 0, tags: [], textLen: 0, photo: false, bill: false };
+
+  // Build stars
+  ['taste', 'portion', 'value'].forEach(cat => {
+    const c = document.getElementById('stars-' + cat);
+    for (let i = 1; i <= 5; i++) {
+      const b = document.createElement('button');
+      b.className = 'star'; b.textContent = '★';
+      b.onclick = () => rate(cat, i);
+      c.appendChild(b);
+    }
+  });
+
+  // Build tags
+  Object.entries(TAGS).forEach(([g, tags]) => {
+    const c = document.getElementById('tags-' + g);
+    tags.forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'tag'; b.textContent = t;
+      b.onclick = () => togTag(b, t);
+      c.appendChild(b);
+    });
+  });
+
+  function rate(cat, val) {
+    S[cat] = val;
+    document.querySelectorAll('#stars-' + cat + ' .star').forEach((s, i) => s.classList.toggle('filled', i < val));
+    document.getElementById('hint-' + cat).textContent = LABELS[val];
+    document.getElementById('row-' + cat).classList.toggle('rated', val > 0);
+    sync();
+  }
+
+  function togTag(btn, tag) {
+    const i = S.tags.indexOf(tag);
+    if (i > -1) { S.tags.splice(i, 1); btn.classList.remove('selected'); }
+    else { S.tags.push(tag); btn.classList.add('selected'); }
+    sync();
+  }
+
+  function togglePhoto() {
+    S.photo = !S.photo;
+    const btn = document.getElementById('photoBtn');
+    btn.textContent = S.photo ? 'Photo added' : 'Add Photo';
+    btn.classList.toggle('added', S.photo);
+    sync();
+  }
+
+  function toggleBill() {
+    S.bill = !S.bill;
+    const btn = document.getElementById('billBtn');
+    if (S.bill) {
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Bill uploaded';
+      btn.classList.add('uploaded');
+    } else {
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> Upload Bill / Receipt';
+      btn.classList.remove('uploaded');
+    }
+    sync();
+  }
+
+  function updateText() {
+    S.textLen = document.getElementById('reviewText').value.length;
+    sync();
+  }
+
+  function sync() {
+    const rCount = [S.taste, S.portion, S.value].filter(v => v > 0).length;
+    const ratings = rCount === 3;
+    const tags = S.tags.length >= 1;
+    const text = S.textLen >= 30;
+    const all = ratings && tags && text;
+
+    // Section nums
+    document.getElementById('num-1').classList.toggle('done', ratings);
+    document.getElementById('num-2').classList.toggle('done', tags);
+    document.getElementById('num-3').classList.toggle('done', text);
+
+    // Checklist
+    setCheck('check-ratings', 'dot-ratings', ratings);
+    setCheck('check-tags', 'dot-tags', tags);
+    setCheck('check-text', 'dot-text', text);
+
+    // Progress ring
+    const steps = [ratings, tags, text];
+    const done = steps.filter(Boolean).length;
+    const pct = Math.round((done / 3) * 100);
+    const circ = 188.5;
+    document.getElementById('ringFg').style.strokeDashoffset = circ - (circ * pct / 100);
+    document.getElementById('ringLabel').textContent = pct + '%';
+    document.getElementById('progressText').innerHTML = done === 3
+      ? '<strong>All done!</strong> Your review is ready to submit.'
+      : `<strong>${3 - done} section${3 - done > 1 ? 's' : ''}</strong> remaining.`;
+
+    // Char count
+    document.getElementById('charCount').textContent = S.textLen + ' / 30 minimum';
+    document.getElementById('charCount').classList.toggle('met', text);
+    const rem = 30 - S.textLen;
+    document.getElementById('charHelp').textContent = rem > 0 && S.textLen > 0 ? rem + ' more to go' : '';
+
+    // Submit buttons
+    document.getElementById('navSubmit').disabled = !all;
+    document.getElementById('mainSubmit').disabled = !all;
+    document.getElementById('submitHint').innerHTML = all
+      ? '<strong>Ready to go!</strong> Your review looks great.'
+      : 'Complete all required fields to submit';
+
+    // Live preview
+    updatePreview();
+  }
+
+  function setCheck(itemId, dotId, done) {
+    document.getElementById(itemId).classList.toggle('done', done);
+    const dot = document.getElementById(dotId);
+    dot.classList.toggle('done', done);
+    dot.innerHTML = done ? '✓' : '';
+  }
+
+  function updatePreview() {
+    const el = document.getElementById('previewContent');
+    const hasAnything = S.taste > 0 || S.portion > 0 || S.value > 0 || S.tags.length > 0 || S.textLen > 0;
+    if (!hasAnything) {
+      el.innerHTML = '<div class="preview-empty">Your review will appear here as you type...</div>';
+      return;
+    }
+
+    const avg = [S.taste, S.portion, S.value].filter(v => v > 0);
+    const overall = avg.length ? (avg.reduce((a, b) => a + b, 0) / avg.length) : 0;
+    const starsHtml = Array.from({ length: 5 }, (_, i) =>
+      `<span class="${i < Math.round(overall) ? 'filled' : ''}">★</span>`
+    ).join('');
+
+    const subs = ['taste', 'portion', 'value'].map(c =>
+      `<span class="${S[c] > 0 ? 'active' : ''}">${c.charAt(0).toUpperCase() + c.slice(1)}: ${S[c] > 0 ? S[c] + '.0' : '—'}</span>`
+    ).join('');
+
+    const tagsHtml = S.tags.map(t => `<span class="preview-tag">${t}</span>`).join('');
+    const textVal = document.getElementById('reviewText').value;
+    const textHtml = textVal ? `<div class="preview-text">"${textVal.substring(0, 120)}${textVal.length > 120 ? '...' : ''}"</div>` : '';
+    const verifiedHtml = S.bill ? '<div class="preview-verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Verified Purchase</div>' : '';
+
+    el.innerHTML = `
+      <div class="preview-stars">${starsHtml}</div>
+      <div class="preview-subs">${subs}</div>
+      ${tagsHtml ? '<div class="preview-tags">' + tagsHtml + '</div>' : ''}
+      ${textHtml}
+      ${verifiedHtml}
+    `;
+  }
+
+  sync();
+
+  // Reveal animation
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

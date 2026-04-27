@@ -9,6 +9,7 @@ import { REVIEW_FULL_MIN_TEXT_LENGTH } from '@/lib/types/rewards'
 import { captureError, addBreadcrumb, logRouteDuration } from '@/lib/monitoring/sentry'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { isTypesenseConfigured, getTypesenseClient } from '@/lib/repositories/typesense/typesenseClient'
+import { syncRestaurantToTypesense } from '@/lib/services/typesense-restaurant-sync'
 import { invalidateAnalyticsCache } from '@/lib/services/analytics-cache'
 import { adminDb } from '@/lib/firebase/admin-server'
 import { COLLECTIONS } from '@/lib/firebase/config'
@@ -40,6 +41,8 @@ export async function POST(req: Request) {
         restaurantId: body.restaurantId,
         photoFile: null,
         photoPreviewUrl: body.photoUrl ?? null,
+        billFile: null,
+        billPreviewUrl: body.billUrl ?? null,
         tasteRating: body.tasteRating,
         portionRating: body.portionRating,
         valueRating: body.valueRating,
@@ -107,6 +110,10 @@ export async function POST(req: Request) {
           })
       }).catch((err) => captureError(err, { route: '/api/reviews', extra: { phase: 'typesense-sync' } }))
     }
+
+    syncRestaurantToTypesense(body.restaurantId).catch((err) =>
+      captureError(err, { route: '/api/reviews', extra: { phase: 'typesense-restaurant-sync' } }),
+    )
 
     invalidateAnalyticsCache(body.restaurantId).catch((err) =>
       captureError(err, { route: '/api/reviews', extra: { phase: 'analytics-cache-invalidation' } }),
